@@ -37,6 +37,9 @@ public class Event   {
     @Column(name="endingTime")
     private LocalTime endingTime;
 
+    private long x;
+    private long y;
+
     public Event() {
     }
 
