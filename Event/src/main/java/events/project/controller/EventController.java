@@ -1,13 +1,20 @@
 package events.project.controller;
 
 
-import events.project.ValidationErrorBuilder;
+import events.project.Specification.EventSpecificationBuilder;
+import events.project.events.project.service.PointService;
+import events.project.events.project.service.PointServiceImpl;
+import events.project.model.Point;
+import events.project.repositories.PointRepository;
+import events.project.validation.ValidationErrorBuilder;
 import events.project.events.project.service.EventServiceImpl;
 import events.project.model.Event;
 import events.project.model.EventType;
+import events.project.repositories.EventRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,7 +27,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+//@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @RestController
 public class EventController {
 
@@ -29,10 +40,12 @@ public class EventController {
 
 
     private EventServiceImpl eventService;
+    private PointServiceImpl pointService;
 
     @Autowired
-    public EventController(EventServiceImpl es){
+    public EventController(EventServiceImpl es, PointServiceImpl ps){
         this.eventService=es;
+        this.pointService=ps;
 
     }
 
@@ -62,6 +75,8 @@ public class EventController {
 
     @RequestMapping(value = "/addEvent", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addEvent(@Valid @RequestBody Event event, BindingResult result, UriComponentsBuilder ucBuilder) {
+
+
         logger.info("Creating Event : {}", event);
 
         if (result.hasErrors()) {
@@ -73,12 +88,18 @@ public class EventController {
             return new ResponseEntity(new CustomErrorType("Unable to create. Event with name " +
                     event.getName() + " already exist."), HttpStatus.CONFLICT);
         }
+        //Point p = new Point(event.getPoint().getLongitude(), event.getPoint().getLatitude());
+        System.out.println("jjjjjjjjj " + event.getPoint().getLongitude());
+        System.out.println("jjjjjjjjj " + event.getPoint().getLatitude());
+        //pointService.savePoint(p);
         eventService.saveEvent(event);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/event/{id}").buildAndExpand(event.getId()).toUri());
         return new ResponseEntity<String>(headers, HttpStatus.CREATED);
     }
+
+
 
 
 
@@ -150,6 +171,20 @@ public class EventController {
     }
 
 
+@RequestMapping(value="new",  method = RequestMethod.POST)
+   public ResponseEntity<List<Event>> filtring (@RequestParam (required =false) String name , @RequestParam EventType eventType){
+    List<Event> events = eventService.findAll();
+
+    List<Event> collect2 = events.stream().filter(e -> e.getName().equals(name)).filter(e -> e.getEventType().equals(eventType.toString()))
+            .collect(Collectors.toList());
+    if (collect2.isEmpty()) {
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+    return new ResponseEntity<List<Event>>(collect2, HttpStatus.OK);
+
+}
+
+
 
     @RequestMapping(value = "getEventByDateBetween/{date1}/{date2}", method = RequestMethod.GET)
     public ResponseEntity<List<Event>> getEventByDateBetween(
@@ -165,4 +200,24 @@ public class EventController {
 
     }
 
+
+    @Autowired
+    private EventRepository repo;
+
+    @RequestMapping(method = RequestMethod.GET, value = "/users")
+    @ResponseBody
+    public List<Event> search(@RequestParam(value = "search") String search) {
+        EventSpecificationBuilder builder = new EventSpecificationBuilder();
+        Pattern pattern = Pattern.compile("(\\w+?)(\\?|<|>)(\\w+?),");
+        Matcher matcher = pattern.matcher(search + ",");
+        while (matcher.find()) {
+            builder.with(matcher.group(1), matcher.group(2), matcher.group(3));
+        }
+
+        Specification<Event> spec = builder.build();
+        return repo.findAll(spec);
+    }
 }
+
+
+

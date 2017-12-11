@@ -1,4 +1,4 @@
-package events.project;
+package events.project.validation;
 
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;

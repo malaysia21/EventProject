@@ -1,4 +1,4 @@
-package events.project;
+package events.project.validation;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -10,15 +10,12 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.*;
 
 @Documented
-@Constraint(validatedBy = EventTypeValidator.class)
+@Constraint(validatedBy = DateValidator.class)
 @Target({ METHOD, FIELD, CONSTRUCTOR, PARAMETER, ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 
-public @interface  EventTypeConstraint{
-    String message() default "Invalid type of event";
+public @interface DateConstraint {
+    String message() default "Invalid date";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
-    Class<? extends java.lang.Enum<?>> enumClass();
-    boolean ignoreCase() default false;
-
 }

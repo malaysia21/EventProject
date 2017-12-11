@@ -1,4 +1,4 @@
-package events.project;
+package events.project.validation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
