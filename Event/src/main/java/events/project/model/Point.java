@@ -11,9 +11,9 @@ public class Point {
     private Long id;
 
     @Column(name="dl")
-    private Long longitude;
+    private long longitude;
     @Column(name="sz")
-    private Long latitude;
+    private long latitude;
 
     @Column
     @OneToMany(mappedBy = "point")
@@ -21,24 +21,24 @@ public class Point {
 
     public Point() {}
 
-    public Point(Long longitude, Long latitude) {
+    public Point(long longitude, long latitude) {
         this.longitude = longitude;
         this.latitude = latitude;
     }
 
-    public Long getLongitude() {
+    public long getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(Long longitude) {
+    public void setLongitude(long longitude) {
         this.longitude = longitude;
     }
 
-    public Long getLatitude() {
+    public long getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(Long latitude) {
+    public void setLatitude(long latitude) {
         this.latitude = latitude;
     }
 

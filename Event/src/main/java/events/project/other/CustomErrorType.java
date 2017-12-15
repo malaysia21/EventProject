@@ -1,4 +1,4 @@
-package events.project.controller;
+package events.project.other;
 
 public class CustomErrorType {
     private String errorMessage;

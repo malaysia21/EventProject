@@ -1,11 +1,11 @@
 package events.project.controller;
 
 
-import events.project.Specification.EventSpecificationBuilder;
-import events.project.events.project.service.PointService;
+import events.project.events.project.service.AdressServiceImpl;
+import events.project.other.CustomErrorType;
+import events.project.specification.EventSpecificationBuilder;
 import events.project.events.project.service.PointServiceImpl;
-import events.project.model.Point;
-import events.project.repositories.PointRepository;
+import events.project.specification2.EventSpecification;
 import events.project.validation.ValidationErrorBuilder;
 import events.project.events.project.service.EventServiceImpl;
 import events.project.model.Event;
@@ -41,11 +41,15 @@ public class EventController {
 
     private EventServiceImpl eventService;
     private PointServiceImpl pointService;
+    private AdressServiceImpl adressService;
+    @Autowired
+    private EventRepository eventRepository;
 
     @Autowired
-    public EventController(EventServiceImpl es, PointServiceImpl ps){
+    public EventController(EventServiceImpl es, PointServiceImpl ps, AdressServiceImpl as){
         this.eventService=es;
         this.pointService=ps;
+        this.adressService=as;
 
     }
 
@@ -75,33 +79,24 @@ public class EventController {
 
     @RequestMapping(value = "/addEvent", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addEvent(@Valid @RequestBody Event event, BindingResult result, UriComponentsBuilder ucBuilder) {
-
-
         logger.info("Creating Event : {}", event);
-
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
         }
-
         if (eventService.isEventExist(event)) {
             logger.error("Unable to create. An Event with name {} already exist", event.getName());
             return new ResponseEntity(new CustomErrorType("Unable to create. Event with name " +
                     event.getName() + " already exist."), HttpStatus.CONFLICT);
         }
-        //Point p = new Point(event.getPoint().getLongitude(), event.getPoint().getLatitude());
         System.out.println("jjjjjjjjj " + event.getPoint().getLongitude());
         System.out.println("jjjjjjjjj " + event.getPoint().getLatitude());
-        //pointService.savePoint(p);
+
         eventService.saveEvent(event);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(ucBuilder.path("/event/{id}").buildAndExpand(event.getId()).toUri());
         return new ResponseEntity<String>(headers, HttpStatus.CREATED);
     }
-
-
-
-
 
     @RequestMapping(value = "/event/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateEvent(@PathVariable("id") long id, @RequestBody Event event) {
@@ -111,7 +106,6 @@ public class EventController {
             return new ResponseEntity(new CustomErrorType("Unable to upate. Event with id " + id + " not found."),
                     HttpStatus.NOT_FOUND);
         }
-
         currentEvent.setName(event.getName());
         currentEvent.setEventType(event.getEventType());
         currentEvent.setDate(event.getDate());
@@ -139,6 +133,27 @@ public class EventController {
         eventService.deleteAllEvents();
         return new ResponseEntity<Event>(HttpStatus.NO_CONTENT);
     }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/users2")
+    @ResponseBody
+    public List<Event> search2(@RequestParam (required =false) String name,
+                               @RequestParam (required =false) String eventType,
+                               @RequestParam  (required =false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date1,
+                               @RequestParam  (required =false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date2
+    ) {
+
+        Specification<Event> eventSpecification1 = EventSpecification.withDynamicQuery(name, eventType, date1, date2);
+
+        return eventRepository.findAll(eventSpecification1);
+
+    }
+
+
+
+
+
+
+ //dodatkowe
 
     @RequestMapping(value = "getEventByFirstName/{name}", method = RequestMethod.GET)
     public ResponseEntity<List<Event>> getEventByFirstName(@PathVariable String name){
@@ -183,9 +198,6 @@ public class EventController {
     return new ResponseEntity<List<Event>>(collect2, HttpStatus.OK);
 
 }
-
-
-
     @RequestMapping(value = "getEventByDateBetween/{date1}/{date2}", method = RequestMethod.GET)
     public ResponseEntity<List<Event>> getEventByDateBetween(
             @PathVariable(name = "date1")
@@ -200,23 +212,23 @@ public class EventController {
 
     }
 
-
-    @Autowired
-    private EventRepository repo;
-
     @RequestMapping(method = RequestMethod.GET, value = "/users")
     @ResponseBody
     public List<Event> search(@RequestParam(value = "search") String search) {
         EventSpecificationBuilder builder = new EventSpecificationBuilder();
-        Pattern pattern = Pattern.compile("(\\w+?)(\\?|<|>)(\\w+?),");
+        Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?),");
         Matcher matcher = pattern.matcher(search + ",");
         while (matcher.find()) {
             builder.with(matcher.group(1), matcher.group(2), matcher.group(3));
         }
 
         Specification<Event> spec = builder.build();
-        return repo.findAll(spec);
+        return eventRepository.findAll(spec);
     }
+
+
+
+
 }
 
 

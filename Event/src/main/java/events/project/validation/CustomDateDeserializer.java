@@ -3,6 +3,7 @@ package events.project.validation;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.springframework.expression.ParseException;
 
@@ -25,7 +26,7 @@ public class CustomDateDeserializer extends StdDeserializer<LocalDate> {
 
     @Override
     public LocalDate deserialize(JsonParser jsonparser, DeserializationContext context)
-            throws IOException, JsonProcessingException {
+            throws IOException, JsonMappingException {
         String date = jsonparser.getText();
         try {
             return LocalDate.parse(date, formatter);

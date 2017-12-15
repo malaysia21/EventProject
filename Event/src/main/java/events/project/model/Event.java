@@ -1,11 +1,9 @@
 package events.project.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import events.project.validation.CustomDateDeserializer;
 import events.project.validation.CustomLocalDateTimeSerializer;
-import events.project.validation.DateConstraint;
 import events.project.validation.EventTypeConstraint;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.stereotype.Component;
@@ -33,8 +31,11 @@ public class Event  implements Serializable {
     @EventTypeConstraint(enumClass = EventType.class, ignoreCase = true)
     private String eventType;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.ALL)
     private Point point;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Adress adress;
 
     @Column(name="startingTime")
     private LocalTime startingTime;
@@ -42,22 +43,23 @@ public class Event  implements Serializable {
     @Column(name="endingTime")
     private LocalTime endingTime;
 
-    private long x;    @Column(name="date")
+    @Column(name="date")
     //@JsonFormat(pattern = "dd-MM-yyyy")
     @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
     @JsonDeserialize(using = CustomDateDeserializer.class)
-    @DateConstraint()
     private LocalDate date;
+
 
 
     public Event() {
     }
 
 
-    public Event(String name, String eventType, Point point, LocalTime startingTime, LocalTime endingTime, LocalDate date) {
+    public Event(String name, String eventType, Point point, Adress adress, LocalTime startingTime, LocalTime endingTime, LocalDate date) {
         this.name = name;
         this.eventType = eventType;
         this.point = point;
+        this.adress = adress;
         this.startingTime = startingTime;
         this.endingTime = endingTime;
         this.date = date;
@@ -69,6 +71,14 @@ public class Event  implements Serializable {
 
     public void setPoint(Point point) {
         this.point = point;
+    }
+
+    public Adress getAdress() {
+        return adress;
+    }
+
+    public void setAdress(Adress adress) {
+        this.adress = adress;
     }
 
     public Long getId() {
@@ -118,6 +128,8 @@ public class Event  implements Serializable {
     public void setEndingTime(LocalTime endingTime) {
         this.endingTime = endingTime;
     }
+
+
 
     @Override
     public String toString() {

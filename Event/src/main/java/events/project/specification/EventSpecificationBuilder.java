@@ -1,4 +1,4 @@
-package events.project.Specification;
+package events.project.specification;
 
 import events.project.model.Event;
 import org.springframework.data.jpa.domain.Specification;

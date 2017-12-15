@@ -4,6 +4,7 @@ package events.project.repositories;
 import events.project.model.Event;
 import events.project.model.EventType;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

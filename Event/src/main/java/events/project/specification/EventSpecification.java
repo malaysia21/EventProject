@@ -1,4 +1,4 @@
-package events.project.Specification;
+package events.project.specification;
 
 import events.project.model.Event;
 import org.springframework.data.jpa.domain.Specification;
@@ -7,6 +7,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.time.LocalDate;
 
 public class EventSpecification implements Specification<Event> {
     private SearchCriteria criteria;
@@ -14,6 +15,7 @@ public class EventSpecification implements Specification<Event> {
     public EventSpecification(SearchCriteria criteria) {
         this.criteria = criteria;
     }
+
 
     @Override
     public Predicate toPredicate
@@ -27,12 +29,17 @@ public class EventSpecification implements Specification<Event> {
             return builder.lessThanOrEqualTo(
                     root.<String> get(criteria.getKey()), criteria.getValue().toString());
         }
-        else if (criteria.getOperation().equalsIgnoreCase("?")) {
+        else if (criteria.getOperation().equalsIgnoreCase(":")) {
             if (root.get(criteria.getKey()).getJavaType() == String.class) {
                 return builder.like(
-                        root.<String>get(criteria.getKey()),  criteria.getValue() + "");
-            } else {
-                return builder.equal(root.get(criteria.getKey()), criteria.getValue().toString());
+                        root.<String>get(criteria.getKey()), criteria.getValue() + "");
+            }
+            else if (root.get(criteria.getKey()).getJavaType() == LocalDate.class) {
+                return builder.equal(root.get(criteria.getKey()), criteria.getValue());
+            }
+
+            else {
+                return builder.equal(root.get(criteria.getKey()), criteria.getValue());
             }
         }
         return null;

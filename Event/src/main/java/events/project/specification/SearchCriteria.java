@@ -1,4 +1,4 @@
-package events.project.Specification;
+package events.project.specification;
 
 public class SearchCriteria {
     private String key;

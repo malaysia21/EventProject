@@ -1,4 +1,4 @@
-package events.project;
+package events.project.other;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
