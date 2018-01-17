@@ -1,10 +1,12 @@
 package events.project.events.project.service;
 
 
-import events.project.model.Event;
-import events.project.model.EventType;
+import events.project.model.*;
+import events.project.other.EventSearchingToEventRequestMapper;
 import events.project.repositories.EventRepository;
+import events.project.users.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,8 @@ public class EventServiceImpl implements  EventService{
 
 
     private EventRepository eventRepository;
+
+    private EventSearchingToEventRequestMapper mapper = new EventSearchingToEventRequestMapper();
 
     @Autowired
     public EventServiceImpl(EventRepository er){
@@ -34,14 +38,16 @@ public class EventServiceImpl implements  EventService{
     }
 
     @Override
-    public void saveEvent(Event event) {
+    public void saveEvent(User user, EventDto eventDto) {
+        Event event = mapper.map(eventDto);
+        event.setUser(user);
         eventRepository.save(event);
     }
 
-    @Override
-    public void updateEvent(Event event) {
-        saveEvent(event);
-    }
+   // @Override
+//    public void updateEvent(Event event) {
+//        saveEvent(event);
+//    }
 
     @Override
     public void deleteEventById(Long id) {
@@ -77,4 +83,13 @@ public class EventServiceImpl implements  EventService{
     public List<Event> findByDateBetween(LocalDate date1, LocalDate date2){
         return eventRepository.findByDateBetween(date1,date2);
     };
+
+    public List<Event> findAll(Specification<Event> eventSpecification1) {
+        return eventRepository.findAll(eventSpecification1);
+    }
+
+    public void acceptEvent(Long id) {
+        Event event = eventRepository.findById(id);
+        event.setConfirm(true);
+    }
 }

@@ -1,6 +1,7 @@
 package events.project.specification;
 
 import events.project.model.Event;
+import events.project.model.Point;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -8,40 +9,45 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.time.LocalDate;
-
-public class EventSpecification implements Specification<Event> {
-    private SearchCriteria criteria;
-
-    public EventSpecification(SearchCriteria criteria) {
-        this.criteria = criteria;
-    }
+import java.util.ArrayList;
+import java.util.List;
 
 
-    @Override
-    public Predicate toPredicate
-            (Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
+public class EventSpecification {
 
-        if (criteria.getOperation().equalsIgnoreCase(">")) {
-            return builder.greaterThanOrEqualTo(
-                    root.<String> get(criteria.getKey()), criteria.getValue().toString());
-        }
-        else if (criteria.getOperation().equalsIgnoreCase("<")) {
-            return builder.lessThanOrEqualTo(
-                    root.<String> get(criteria.getKey()), criteria.getValue().toString());
-        }
-        else if (criteria.getOperation().equalsIgnoreCase(":")) {
-            if (root.get(criteria.getKey()).getJavaType() == String.class) {
-                return builder.like(
-                        root.<String>get(criteria.getKey()), criteria.getValue() + "");
+    public static Specification<Event> withDynamicQuery(String name, String eventType, LocalDate date1, LocalDate date2,
+                                                        Point point1, Point point2
+                                                        ) {
+        return new Specification<Event>() {
+            @Override
+            public Predicate toPredicate(Root<Event> product,  CriteriaQuery<?> query, CriteriaBuilder builder) {
+
+                List<Predicate> predicates = new ArrayList<Predicate>();
+
+                if (name != null) {
+                    predicates.add(builder.and(builder.like(product.get("name"), "%" + name.toLowerCase()+ "%")));
+                }
+                if (eventType != null) {
+                    predicates.add(builder.and(builder.equal(product.get("eventType"), eventType)));
+                }
+                if (date1 != null & date2 !=null) {
+                    predicates.add(builder.and(builder.between(product.get("date"), date1, date2)));
+                }
+                if (point1 != null & point2 != null) {
+                    predicates.add(builder.and(builder.between(product.get("point").get("longitude"), point1.getLongitude(), point2.getLongitude())));
+
+                }
+                if (point1 != null & point2 != null) {
+                    predicates.add(builder.and(builder.between(product.get("point").get("latitude"), point2.getLatitude(), point1.getLatitude())));
+
+                }
+                Predicate[] predicatesArray = new Predicate[predicates.size()];
+                for (Predicate p: predicatesArray
+                     ) {
+                    System.out.println(p);
+                }
+                return builder.and(predicates.toArray(predicatesArray));
             }
-            else if (root.get(criteria.getKey()).getJavaType() == LocalDate.class) {
-                return builder.equal(root.get(criteria.getKey()), criteria.getValue());
-            }
-
-            else {
-                return builder.equal(root.get(criteria.getKey()), criteria.getValue());
-            }
-        }
-        return null;
+        };
     }
 }

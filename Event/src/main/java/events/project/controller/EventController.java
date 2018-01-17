@@ -2,20 +2,19 @@ package events.project.controller;
 
 
 import events.project.events.project.service.AdressServiceImpl;
+import events.project.model.*;
 import events.project.other.CustomErrorType;
-import events.project.specification.EventSpecificationBuilder;
 import events.project.events.project.service.PointServiceImpl;
-import events.project.specification2.EventSpecification;
+import events.project.specification.EventSpecification;
+import events.project.users.User;
+import events.project.users.UserService;
 import events.project.validation.ValidationErrorBuilder;
 import events.project.events.project.service.EventServiceImpl;
-import events.project.model.Event;
-import events.project.model.EventType;
 import events.project.repositories.EventRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,15 +23,16 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.time.LocalDate;
+import java.security.Principal;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 //@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
+@CrossOrigin(maxAge = 3600)
 @RestController
+
 public class EventController {
 
 
@@ -42,8 +42,13 @@ public class EventController {
     private EventServiceImpl eventService;
     private PointServiceImpl pointService;
     private AdressServiceImpl adressService;
+    private EventDto eventDto;
+
     @Autowired
     private EventRepository eventRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     public EventController(EventServiceImpl es, PointServiceImpl ps, AdressServiceImpl as){
@@ -53,143 +58,155 @@ public class EventController {
 
     }
 
-    @RequestMapping(value = "/events", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ExceptionHandler(EventNotFoundException.class)
+    public ResponseEntity<CustomErrorType> eventNotFound(EventNotFoundException e)
+    {
+        Long eventId = e.getEventId();
+        CustomErrorType error = new CustomErrorType("Event with id " + eventId  + " not found");
+        return new ResponseEntity<CustomErrorType>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(EventExistException.class)
+    public ResponseEntity<CustomErrorType> eventExist(EventExistException e)
+    {
+        String eventName = e.getEvent().getName();
+        CustomErrorType error = new CustomErrorType( "Unable to create. Event with name " +
+                eventName + " already exist.");
+        return new ResponseEntity<CustomErrorType>(error, HttpStatus.CONFLICT);
+    }
+
+    /**
+     * Pobranie wszytskich wydarzen
+     * @return lista wydarzen, status odpowiedzi
+     */
+
+    @GetMapping(value = "/allEvents", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Event>> getEvent(){
         List<Event> eventList = eventService.findAll();
         if(eventList.isEmpty()){
             return new ResponseEntity<List<Event>>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<List<Event>>(eventList, HttpStatus.OK);
-
-
     }
 
-    @RequestMapping(value="/event/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    /**
+     * Pobranie wydarzenia o danym id
+     * @param id  identyfikator wydarzenia
+     * @return wydarzenie, status odpowiedzi
+     */
+
+    @GetMapping(value="/event/{id}",  produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Event> getEvent(@PathVariable Long id){
-        logger.info("Fetching Event with id {}", id);
         Event event = eventService.findById(id);
-        if(event==null){
-            logger.error("Event with id {} not found.", id);
-            return new ResponseEntity(new CustomErrorType("Event with id " + id + " not found"),
-                    HttpStatus.NOT_FOUND);
-        }
+        if(event==null){throw new EventNotFoundException(id);}
         return new ResponseEntity<Event>(event, HttpStatus.OK);
     }
+    /**
+     * Utworzenie nowego wydarzenia
+     * @param event wydarzenie
+     * @return header nowego wydarzenia, status odpowiedzi
+     */
 
-
-    @RequestMapping(value = "/addEvent", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addEvent(@Valid @RequestBody Event event, BindingResult result, UriComponentsBuilder ucBuilder) {
-        logger.info("Creating Event : {}", event);
+    @PostMapping(value = "/addEvent", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addEvent(@Valid @RequestBody EventDto event, BindingResult result, UriComponentsBuilder ucBuilder, HttpServletRequest request) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
         }
-        if (eventService.isEventExist(event)) {
-            logger.error("Unable to create. An Event with name {} already exist", event.getName());
-            return new ResponseEntity(new CustomErrorType("Unable to create. Event with name " +
-                    event.getName() + " already exist."), HttpStatus.CONFLICT);
-        }
-        System.out.println("jjjjjjjjj " + event.getPoint().getLongitude());
-        System.out.println("jjjjjjjjj " + event.getPoint().getLatitude());
+//        if (eventService.isEventExist(event))
+//            {throw new EventExistException(event);}
 
-        eventService.saveEvent(event);
+        Principal principal = request.getUserPrincipal();
+        String email = principal.getName();
+        User user = userService.findByEmail(email);
+        System.out.println(user);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/event/{id}").buildAndExpand(event.getId()).toUri());
-        return new ResponseEntity<String>(headers, HttpStatus.CREATED);
+        eventService.saveEvent(user, event);
+
+//        HttpHeaders headers = new HttpHeaders();
+//       headers.setLocation(ucBuilder.path("/event/{id}").buildAndExpand(event.getId()).toUri());
+        return new ResponseEntity<String>(HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/event/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateEvent(@PathVariable("id") long id, @RequestBody Event event) {
+    /**
+     * Modyfikacja wydarzenia
+     * @param event wydarzenie
+     * @param id idetyfikator wydarzenia
+     * @return zmodyfikowane wydarzenie, status odpowiedzi
+     */
+
+    @PutMapping(value = "/updateEvent/{id}",consumes = MediaType.APPLICATION_JSON_VALUE,  produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateEvent(@PathVariable("id") long id, @Valid @RequestBody Event event, BindingResult result) {
        Event currentEvent = eventService.findById(id);
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
+        }
         if (currentEvent == null) {
-            logger.error("Unable to update. Event with id {} not found.", id);
-            return new ResponseEntity(new CustomErrorType("Unable to upate. Event with id " + id + " not found."),
-                    HttpStatus.NOT_FOUND);
+            {throw new EventNotFoundException(id);}
         }
         currentEvent.setName(event.getName());
         currentEvent.setEventType(event.getEventType());
         currentEvent.setDate(event.getDate());
+        currentEvent.setStartingTime(event.getStartingTime());
+        currentEvent.setEndingTime(event.getEndingTime());
+        currentEvent.setAdress(event.getAdress());
+        currentEvent.setPoint(event.getPoint());
 
-        eventService.updateEvent(currentEvent);
+       // eventService.updateEvent(currentEvent);
         return new ResponseEntity<Event>(currentEvent, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/event/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deleteEvent(@PathVariable("id") long id) {
-        logger.info("Fetching & Deleting Event with id {}", id);
+    /**
+     * Usuwanie wydarzenia przez admina
+     * @param id idetyfikator wydarzenia
+     * @return status odpowiedzi
+     */
+    @DeleteMapping(value = "/admin/deleteEvent/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE, headers = "Accept=application/json, application/xml" )
+    public ResponseEntity<String> deleteEvent(@PathVariable("id") long id) {
         Event event = eventService.findById(id);
         if (event == null) {
-            logger.error("Unable to delete. Event with id {} not found.", id);
-            return new ResponseEntity(new CustomErrorType("Unable to delete. Event with id " + id + " not found."),
-                    HttpStatus.NOT_FOUND);
+            {throw new EventNotFoundException(id);}
         }
         eventService.deleteEventById(id);
-        return new ResponseEntity<Event>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<String>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/event/", method = RequestMethod.DELETE)
-    public ResponseEntity<Event> deleteAllEvents() {
-        logger.info("Deleting All Events");
-        eventService.deleteAllEvents();
-        return new ResponseEntity<Event>(HttpStatus.NO_CONTENT);
+    /**
+     * Zatwierdzenie wydarzenia przed admina
+     * @param id idetyfikator wydarzenia
+     * @return status odpowiedzi
+     */
+    @GetMapping(value = "/admin/acceptEvent/{id}")
+    public ResponseEntity<String> acceptEvent(@PathVariable("id") long id) {
+        Event event = eventService.findById(id);
+        if (event == null) {
+            {throw new EventNotFoundException(id);}
+        }
+        eventService.acceptEvent(id);
+        return new ResponseEntity<String>(HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/users2")
-    @ResponseBody
-    public List<Event> search2(@RequestParam (required =false) String name,
-                               @RequestParam (required =false) String eventType,
-                               @RequestParam  (required =false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date1,
-                               @RequestParam  (required =false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date2
+    /**
+     * Wyszukiwanie wydarzenia
+     * @return lista wydarzen spelniajaca kryteria
+     */
+    @PostMapping( value = "/searchEvent")
+    public ResponseEntity<?>search (@Valid @RequestBody EventSearching s, BindingResult result
     ) {
-
-        Specification<Event> eventSpecification1 = EventSpecification.withDynamicQuery(name, eventType, date1, date2);
-
-        return eventRepository.findAll(eventSpecification1);
-
-    }
-
-
-
-
-
-
- //dodatkowe
-
-    @RequestMapping(value = "getEventByFirstName/{name}", method = RequestMethod.GET)
-    public ResponseEntity<List<Event>> getEventByFirstName(@PathVariable String name){
-        List<Event> events = eventService.findByName(name);
-        if (events.isEmpty()) {
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
         }
-        return new ResponseEntity<List<Event>>(events, HttpStatus.OK);
+
+        Specification<Event> eventSpecification1 = EventSpecification.withDynamicQuery(s.getName(), s.getEventType(), s.getDate1(),
+                s.getDate2(), s.getP1(), s.getP());
+
+        return new ResponseEntity<List<Event>>(eventRepository.findAll(eventSpecification1), HttpStatus.OK);
+
     }
 
-    @RequestMapping(value = "getEventByType/{type}", method = RequestMethod.GET)
-    public ResponseEntity<List<Event>> getEventByType(@PathVariable EventType type){
-        List<Event> events = eventService.findByEventType(type);
-        if (events.isEmpty()) {
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<List<Event>>(events, HttpStatus.OK);
-    }
-
-
-    @RequestMapping(value = "getEventByDate/{date}", method = RequestMethod.GET)
-    public ResponseEntity<List<Event>> getEventByDate(
-            @PathVariable(name = "date")
-            @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date){
-        List<Event> events = eventService.findByDate(date);
-        if (events.isEmpty()) {
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<List<Event>>(events, HttpStatus.OK);
-    }
-
-
-@RequestMapping(value="new",  method = RequestMethod.POST)
+    @RequestMapping(value="new",  method = RequestMethod.POST)
    public ResponseEntity<List<Event>> filtring (@RequestParam (required =false) String name , @RequestParam EventType eventType){
     List<Event> events = eventService.findAll();
-
     List<Event> collect2 = events.stream().filter(e -> e.getName().equals(name)).filter(e -> e.getEventType().equals(eventType.toString()))
             .collect(Collectors.toList());
     if (collect2.isEmpty()) {
@@ -198,33 +215,8 @@ public class EventController {
     return new ResponseEntity<List<Event>>(collect2, HttpStatus.OK);
 
 }
-    @RequestMapping(value = "getEventByDateBetween/{date1}/{date2}", method = RequestMethod.GET)
-    public ResponseEntity<List<Event>> getEventByDateBetween(
-            @PathVariable(name = "date1")
-            @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date1,
-            @PathVariable(name = "date2")
-            @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date2){
-        List<Event> events = eventService.findByDateBetween(date1, date2);
-        if (events.isEmpty()) {
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<List<Event>>(events, HttpStatus.OK);
 
-    }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/users")
-    @ResponseBody
-    public List<Event> search(@RequestParam(value = "search") String search) {
-        EventSpecificationBuilder builder = new EventSpecificationBuilder();
-        Pattern pattern = Pattern.compile("(\\w+?)(:|<|>)(\\w+?),");
-        Matcher matcher = pattern.matcher(search + ",");
-        while (matcher.find()) {
-            builder.with(matcher.group(1), matcher.group(2), matcher.group(3));
-        }
-
-        Specification<Event> spec = builder.build();
-        return eventRepository.findAll(spec);
-    }
 
 
 

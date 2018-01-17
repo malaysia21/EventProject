@@ -1,6 +1,8 @@
 package events.project.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.Digits;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -10,10 +12,13 @@ public class Point {
     @GeneratedValue
     private Long id;
 
+    @Digits(integer = 11, fraction=6)
     @Column(name="dl")
-    private long longitude;
+    private Float longitude;
+
+    @Digits(integer = 11, fraction=6)
     @Column(name="sz")
-    private long latitude;
+    private Float latitude;
 
     @Column
     @OneToMany(mappedBy = "point")
@@ -21,24 +26,24 @@ public class Point {
 
     public Point() {}
 
-    public Point(long longitude, long latitude) {
+    public Point(Float longitude, Float latitude) {
         this.longitude = longitude;
         this.latitude = latitude;
     }
 
-    public long getLongitude() {
+    public Float getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(long longitude) {
+    public void setLongitude(Float longitude) {
         this.longitude = longitude;
     }
 
-    public long getLatitude() {
+    public Float getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(long latitude) {
+    public void setLatitude(Float latitude) {
         this.latitude = latitude;
     }
 

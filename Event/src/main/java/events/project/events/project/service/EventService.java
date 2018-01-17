@@ -2,7 +2,9 @@ package events.project.events.project.service;
 
 
 import events.project.model.Event;
+import events.project.model.EventDto;
 import events.project.model.EventType;
+import events.project.users.User;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,9 +15,9 @@ public interface EventService {
 
     List<Event> findByName(String name);
 
-    void saveEvent(Event event);
+    void saveEvent(User user, EventDto eventDto);
 
-    void updateEvent(Event event);
+    //void updateEvent(Event event);
 
     void deleteEventById(Long id);
 
