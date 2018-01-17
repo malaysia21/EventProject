@@ -1,0 +1,14 @@
+package events.project.other;
+
+import events.project.model.Event;
+import events.project.model.EventDto;
+
+public class EventToEventDtoMapper implements Mapper<Event, EventDto> {
+    @Override
+    public EventDto map(Event event) {
+        return EventDto.New().name(event.getName()).
+                eventType(event.getEventType()).point(event.getPoint()).
+                address(event.getAdress()).startingTime(event.getStartingTime()).
+        endingTime(event.getEndingTime()).date(event.getDate()).userId(event.getUser().getId()).confirm(event.isConfirm()).bulid();
+    }
+}

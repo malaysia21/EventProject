@@ -81,12 +81,12 @@ public class EventController {
      */
 
     @GetMapping(value = "/allEvents", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Event>> getEvent(){
-        List<Event> eventList = eventService.findAll();
+    public ResponseEntity<List<EventDto>> getEvent(){
+        List<EventDto> eventList = eventService.findAll();
         if(eventList.isEmpty()){
-            return new ResponseEntity<List<Event>>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<List<EventDto>>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<List<Event>>(eventList, HttpStatus.OK);
+        return new ResponseEntity<List<EventDto>>(eventList, HttpStatus.OK);
     }
 
     /**
@@ -96,10 +96,10 @@ public class EventController {
      */
 
     @GetMapping(value="/event/{id}",  produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Event> getEvent(@PathVariable Long id){
-        Event event = eventService.findById(id);
+    public ResponseEntity<EventDto> getEvent(@PathVariable Long id){
+        EventDto event = eventService.findById(id);
         if(event==null){throw new EventNotFoundException(id);}
-        return new ResponseEntity<Event>(event, HttpStatus.OK);
+        return new ResponseEntity<EventDto>(event, HttpStatus.OK);
     }
     /**
      * Utworzenie nowego wydarzenia
@@ -112,18 +112,12 @@ public class EventController {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
         }
-//        if (eventService.isEventExist(event))
-//            {throw new EventExistException(event);}
+        if (eventService.isEventExist(event))
+            {throw new EventExistException(event);}
 
         Principal principal = request.getUserPrincipal();
-        String email = principal.getName();
-        User user = userService.findByEmail(email);
-        System.out.println(user);
+        eventService.saveEvent(userService.findByEmail(principal.getName()), event);
 
-        eventService.saveEvent(user, event);
-
-//        HttpHeaders headers = new HttpHeaders();
-//       headers.setLocation(ucBuilder.path("/event/{id}").buildAndExpand(event.getId()).toUri());
         return new ResponseEntity<String>(HttpStatus.CREATED);
     }
 
@@ -135,8 +129,8 @@ public class EventController {
      */
 
     @PutMapping(value = "/updateEvent/{id}",consumes = MediaType.APPLICATION_JSON_VALUE,  produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateEvent(@PathVariable("id") long id, @Valid @RequestBody Event event, BindingResult result) {
-       Event currentEvent = eventService.findById(id);
+    public ResponseEntity<?> updateEvent(@PathVariable("id") long id, @Valid @RequestBody EventDto event, BindingResult result) {
+       EventDto currentEvent = eventService.findById(id);
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
         }
@@ -151,8 +145,8 @@ public class EventController {
         currentEvent.setAdress(event.getAdress());
         currentEvent.setPoint(event.getPoint());
 
-       // eventService.updateEvent(currentEvent);
-        return new ResponseEntity<Event>(currentEvent, HttpStatus.OK);
+        EventDto updateEvent = eventService.updateEvent(currentEvent);
+        return new ResponseEntity<EventDto>(updateEvent, HttpStatus.OK);
     }
 
     /**
@@ -163,7 +157,7 @@ public class EventController {
     @DeleteMapping(value = "/admin/deleteEvent/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE, headers = "Accept=application/json, application/xml" )
     public ResponseEntity<String> deleteEvent(@PathVariable("id") long id) {
-        Event event = eventService.findById(id);
+        EventDto event = eventService.findById(id);
         if (event == null) {
             {throw new EventNotFoundException(id);}
         }
@@ -178,7 +172,7 @@ public class EventController {
      */
     @GetMapping(value = "/admin/acceptEvent/{id}")
     public ResponseEntity<String> acceptEvent(@PathVariable("id") long id) {
-        Event event = eventService.findById(id);
+        EventDto event = eventService.findById(id);
         if (event == null) {
             {throw new EventNotFoundException(id);}
         }
@@ -191,30 +185,43 @@ public class EventController {
      * @return lista wydarzen spelniajaca kryteria
      */
     @PostMapping( value = "/searchEvent")
-    public ResponseEntity<?>search (@Valid @RequestBody EventSearching s, BindingResult result
+    public ResponseEntity<?>search (@Valid @RequestBody EventSearching eventSearching, BindingResult result
     ) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
         }
 
-        Specification<Event> eventSpecification1 = EventSpecification.withDynamicQuery(s.getName(), s.getEventType(), s.getDate1(),
-                s.getDate2(), s.getP1(), s.getP());
+        Specification<Event> eventSpecification = EventSpecification.
+                withDynamicQuery(eventSearching.getName(), eventSearching.getEventType(), eventSearching.getDate1(),
+                        eventSearching.getDate2(), eventSearching.getP1(), eventSearching.getP());
 
-        return new ResponseEntity<List<Event>>(eventRepository.findAll(eventSpecification1), HttpStatus.OK);
+        List<EventDto> allWithCriteria = eventService.findAllWithCriteria(eventSpecification);
+
+        if(allWithCriteria.isEmpty()){
+            return new ResponseEntity<List<EventDto>>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<List<EventDto>>(allWithCriteria , HttpStatus.OK);
+
 
     }
 
-    @RequestMapping(value="new",  method = RequestMethod.POST)
-   public ResponseEntity<List<Event>> filtring (@RequestParam (required =false) String name , @RequestParam EventType eventType){
-    List<Event> events = eventService.findAll();
-    List<Event> collect2 = events.stream().filter(e -> e.getName().equals(name)).filter(e -> e.getEventType().equals(eventType.toString()))
-            .collect(Collectors.toList());
-    if (collect2.isEmpty()) {
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
-    }
-    return new ResponseEntity<List<Event>>(collect2, HttpStatus.OK);
 
-}
+
+
+
+
+
+//    @RequestMapping(value="new",  method = RequestMethod.POST)
+//   public ResponseEntity<List<Event>> filtring (@RequestParam (required =false) String name , @RequestParam EventType eventType){
+//    List<Event> events = eventService.findAll();
+//    List<Event> collect2 = events.stream().filter(e -> e.getName().equals(name)).filter(e -> e.getEventType().equals(eventType.toString()))
+//            .collect(Collectors.toList());
+//    if (collect2.isEmpty()) {
+//        return new ResponseEntity(HttpStatus.NO_CONTENT);
+//    }
+//    return new ResponseEntity<List<Event>>(collect2, HttpStatus.OK);
+
+//}
 
 
 

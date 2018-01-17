@@ -27,11 +27,12 @@ public class Event  implements Serializable {
     private Long id;
 
     @Column(name="name")
-    @NotBlank(message = "Name cannot be empty!")
+    @NotBlank(message = "Name may not be null")
     private String name;
 
     @Column(name="type")
     @EventTypeConstraint(enumClass = EventType.class, ignoreCase = true)
+    @NotNull(message = "Event type may not be null")
     private String eventType;
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -41,17 +42,17 @@ public class Event  implements Serializable {
     private Adress adress;
 
     @Column(name="startingTime")
-    @NotNull(message = "Starting time cannot be empty")
+    @NotNull(message = "Starting time may not be null")
     private LocalTime startingTime;
 
     @Column(name="endingTime")
-    @NotNull(message = "Ending time cannot be empty")
+    @NotNull(message = "Ending time may not be null")
     private LocalTime endingTime;
 
     @Column(name="date")
     @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
     @JsonDeserialize(using = CustomDateDeserializer.class)
-    @NotNull(message = "Date cannot be empty")
+    @NotNull(message = "Date may not be null")
     private LocalDate date;
 
     @ManyToOne

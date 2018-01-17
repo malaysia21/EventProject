@@ -2,7 +2,8 @@ package events.project.events.project.service;
 
 
 import events.project.model.*;
-import events.project.other.EventSearchingToEventRequestMapper;
+import events.project.other.EventDtoToEventMapper;
+import events.project.other.EventToEventDtoMapper;
 import events.project.repositories.EventRepository;
 import events.project.users.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service("eventService")
@@ -20,16 +22,16 @@ public class EventServiceImpl implements  EventService{
 
     private EventRepository eventRepository;
 
-    private EventSearchingToEventRequestMapper mapper = new EventSearchingToEventRequestMapper();
-
+    private EventDtoToEventMapper toEntity = new EventDtoToEventMapper();
+    private EventToEventDtoMapper toDto = new EventToEventDtoMapper();
     @Autowired
     public EventServiceImpl(EventRepository er){
     this.eventRepository=er;
 }
 
     @Override
-    public Event findById(Long id) {
-        return eventRepository.findById(id);
+    public EventDto findById(Long id) {
+        return toDto.map(eventRepository.findById(id));
     }
 
     @Override
@@ -39,53 +41,50 @@ public class EventServiceImpl implements  EventService{
 
     @Override
     public void saveEvent(User user, EventDto eventDto) {
-        Event event = mapper.map(eventDto);
+        Event event = toEntity.map(eventDto);
         event.setUser(user);
         eventRepository.save(event);
     }
 
-   // @Override
-//    public void updateEvent(Event event) {
-//        saveEvent(event);
-//    }
+    @Override
+    public EventDto updateEvent(EventDto event) {
+        Event eventEntity = toEntity.map(event);
+        Event save = eventRepository.save(eventEntity);
+        EventDto eventDto = toDto.map(save);
+        return eventDto;
+    }
 
     @Override
     public void deleteEventById(Long id) {
         eventRepository.delete(id);
     }
 
-    @Override
-    public void deleteAllEvents() {
-        eventRepository.deleteAll();
-    }
 
     @Override
-    public List<Event> findAll() {
-        return eventRepository.findAll();
+    public List<EventDto> findAll() {
+        List<EventDto> list = new ArrayList<>();
+        for (Event e :eventRepository.findAll()) {
+            list.add(toDto.map(e));
+        }
+        return list;
     }
 
-    public boolean isEventExist(Event event) {
-        for (Event e: eventRepository.findAll())
-              if (event.getName().equals(e.getName())){
-                  return true;}
-       return false;
+    public boolean isEventExist(EventDto event) {
+        Event eventEntity = toEntity.map(event);
+        Event eventById = eventRepository.findById(eventEntity.getId());
+
+        if(eventById==null)
+              {return false;}
+       else {return true;}
     }
 
-    public List<Event> findByEventType(EventType eventType){
-        return eventRepository.findByEventType(eventType);
-    };
 
-    public List<Event> findByDate(LocalDate date){
-
-        return eventRepository.findByDate(date);
-    };
-
-    public List<Event> findByDateBetween(LocalDate date1, LocalDate date2){
-        return eventRepository.findByDateBetween(date1,date2);
-    };
-
-    public List<Event> findAll(Specification<Event> eventSpecification1) {
-        return eventRepository.findAll(eventSpecification1);
+    public List<EventDto> findAllWithCriteria(Specification<Event> eventSpecification) {
+        List<EventDto> list = new ArrayList<>();
+        for (Event e :eventRepository.findAll(eventSpecification)) {
+            list.add(toDto.map(e));
+        }
+        return list;
     }
 
     public void acceptEvent(Long id) {

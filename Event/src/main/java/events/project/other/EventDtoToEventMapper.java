@@ -3,7 +3,7 @@ package events.project.other;
 import events.project.model.Event;
 import events.project.model.EventDto;
 
-public class EventSearchingToEventRequestMapper implements Mapper<EventDto,Event> {
+public class EventDtoToEventMapper implements Mapper<EventDto,Event> {
     @Override
     public Event map(EventDto eventRequest) {
         return Event.New().name(eventRequest.getName()).

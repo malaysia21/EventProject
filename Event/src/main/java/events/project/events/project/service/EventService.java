@@ -11,25 +11,18 @@ import java.util.List;
 
 public interface EventService {
 
-    Event findById(Long id);
+    List<EventDto> findAll();
+    EventDto findById(Long id);
 
     List<Event> findByName(String name);
 
     void saveEvent(User user, EventDto eventDto);
 
-    //void updateEvent(Event event);
+    EventDto updateEvent(EventDto event);
 
     void deleteEventById(Long id);
 
-    void deleteAllEvents();
+    boolean isEventExist(EventDto event);
 
-    List<Event> findAll();
 
-    boolean isEventExist(Event event);
-
-    List<Event> findByEventType(EventType eventType);
-
-    List<Event> findByDate(LocalDate date);
-
-    List<Event> findByDateBetween(LocalDate date1, LocalDate date2);
 }

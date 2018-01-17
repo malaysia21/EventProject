@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.persistence.*;
 
 import events.project.model.Event;
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
 
@@ -16,11 +17,14 @@ import org.hibernate.validator.constraints.NotEmpty;
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
+        @NotEmpty (message = "First name may not be empty")
         private String firstName;
+        @NotEmpty(message = "Last name may not be empty")
         private String lastName;
-        @NotEmpty
+        @NotEmpty(message = "Email may not be empty")
+        @Email
         private String email;
-        @NotEmpty
+        @NotEmpty (message = "Password may not be empty")
         private String password;
         @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
         private Set<UserRole> roles = new HashSet<>();

@@ -40,6 +40,9 @@ public class EventDto implements Serializable {
     @NotNull(message = "Date cannot be empty")
     private LocalDate date;
 
+    private Long userId;
+
+    private boolean confirm;
 
     public EventDto() {
     }
@@ -55,6 +58,18 @@ public class EventDto implements Serializable {
         this.date = date;
     }
 
+    public EventDto(String name, String eventType, Point point, Adress adress,
+                    LocalTime startingTime, LocalTime endingTime, LocalDate date, Long userId, boolean confirm) {
+        this.name = name;
+        this.eventType = eventType;
+        this.point = point;
+        this.adress = adress;
+        this.startingTime = startingTime;
+        this.endingTime = endingTime;
+        this.date = date;
+        this.userId = userId;
+        this.confirm = confirm;
+    }
 
 
     public Point getPoint() {
@@ -113,6 +128,21 @@ public class EventDto implements Serializable {
         this.endingTime = endingTime;
     }
 
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public boolean isConfirm() {
+        return confirm;
+    }
+
+    public void setConfirm(boolean confirm) {
+        this.confirm = confirm;
+    }
 
     @Override
     public String toString() {
@@ -125,4 +155,67 @@ public class EventDto implements Serializable {
                 '}';
     }
 
+    public static EventBuilder New() {
+        return new EventDto.EventBuilder();
+    }
+
+    public static class EventBuilder {
+
+        private EventDto event;
+
+        private EventBuilder() {
+            event = new EventDto();
+        }
+
+        public EventDto.EventBuilder name(String name) {
+            event.name = name;
+            return this;
+        }
+
+        public EventDto.EventBuilder eventType(String eventType) {
+            event.eventType = eventType;
+            return this;
+        }
+
+        public EventDto.EventBuilder point(Point point) {
+            event.point = point;
+            return this;
+        }
+
+        public EventDto.EventBuilder address(Adress address) {
+            event.adress = address;
+            return this;
+        }
+
+        public EventDto.EventBuilder startingTime(LocalTime startingTime) {
+            event.startingTime = startingTime;
+            return this;
+        }
+
+        public EventDto.EventBuilder endingTime(LocalTime endingTime) {
+            event.endingTime = endingTime;
+            return this;
+        }
+
+        public EventDto.EventBuilder date(LocalDate date) {
+            event.date = date;
+            return this;
+        }
+
+
+
+        public EventDto.EventBuilder userId(Long userId){
+            event.userId=userId;
+            return this;
+        }
+
+        public EventDto.EventBuilder confirm(boolean confirm){
+            event.confirm=confirm;
+            return this;
+        }
+
+        public EventDto bulid() {
+            return event;
+        }
+    }
 }
