@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 //@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @CrossOrigin(maxAge = 3600)
@@ -35,14 +35,9 @@ import java.util.stream.Collectors;
 
 public class EventController {
 
-
-    public static final Logger logger = LoggerFactory.getLogger(EventController.class);
-
-
     private EventServiceImpl eventService;
     private PointServiceImpl pointService;
     private AdressServiceImpl adressService;
-    private EventDto eventDto;
 
     @Autowired
     private EventRepository eventRepository;
@@ -59,9 +54,10 @@ public class EventController {
     }
 
     @ExceptionHandler(EventNotFoundException.class)
-    public ResponseEntity<CustomErrorType> eventNotFound(EventNotFoundException e)
+    public ResponseEntity<CustomErrorType> eventNotFound(EventNotFoundException e )
     {
         Long eventId = e.getEventId();
+        System.out.println(eventId);
         CustomErrorType error = new CustomErrorType("Event with id " + eventId  + " not found");
         return new ResponseEntity<CustomErrorType>(error, HttpStatus.NOT_FOUND);
     }
@@ -81,8 +77,45 @@ public class EventController {
      */
 
     @GetMapping(value = "/allEvents", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<EventDto>> getEvent(){
+    public ResponseEntity<List<EventDto>> getEvents(){
         List<EventDto> eventList = eventService.findAll();
+        if(eventList.isEmpty()){
+            return new ResponseEntity<List<EventDto>>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<List<EventDto>>(eventList, HttpStatus.OK);
+    }
+
+    /**
+     * Pobranie wszytskich zatwierdzonych wydarzen
+     * @return lista wydarzen, status odpowiedzi
+     */
+
+    @GetMapping(value = "/allConfirmedEvents", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<EventDto>> getConfirmedEvents(){
+        List<EventDto> eventList = eventService.findByConfirmIsTrue();
+        if(eventList.isEmpty()){
+            return new ResponseEntity<List<EventDto>>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<List<EventDto>>(eventList, HttpStatus.OK);
+    }
+
+    /**
+     * Pobranie wszytskich niezatwierdzonych wydarzen
+     * @return lista wydarzen, status odpowiedzi
+     */
+
+    @GetMapping(value = "/allNotConfirmedEvents", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<EventDto>> getNotConfirmedEvents(){
+        List<EventDto> eventList = eventService.findByConfirmIsFalse();
+        if(eventList.isEmpty()){
+            return new ResponseEntity<List<EventDto>>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<List<EventDto>>(eventList, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/userEvents/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<EventDto>> getuserEvents(@PathVariable Long id){
+        List<EventDto> eventList = eventService.findByUser(id);
         if(eventList.isEmpty()){
             return new ResponseEntity<List<EventDto>>(HttpStatus.NO_CONTENT);
         }
@@ -97,6 +130,7 @@ public class EventController {
 
     @GetMapping(value="/event/{id}",  produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EventDto> getEvent(@PathVariable Long id){
+
         EventDto event = eventService.findById(id);
         if(event==null){throw new EventNotFoundException(id);}
         return new ResponseEntity<EventDto>(event, HttpStatus.OK);
@@ -184,7 +218,7 @@ public class EventController {
      * Wyszukiwanie wydarzenia
      * @return lista wydarzen spelniajaca kryteria
      */
-    @PostMapping( value = "/searchEvent")
+    @PostMapping( value = "/ ")
     public ResponseEntity<?>search (@Valid @RequestBody EventSearching eventSearching, BindingResult result
     ) {
         if (result.hasErrors()) {
@@ -204,10 +238,6 @@ public class EventController {
 
 
     }
-
-
-
-
 
 
 

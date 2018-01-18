@@ -46,17 +46,8 @@ public class UserController {
         if (userService.isUserExist(user))
         {throw new UserExistException(user);}
 
-
-//        if (eventService.isEventExist(event)) {
-//            logger.error("Unable to create. An Event with name {} already exist", event.getName());
-//            return new ResponseEntity(new CustomErrorType("Unable to create. Event with name " +
-//                    event.getName() + " already exist."), HttpStatus.CONFLICT);
-//        }
-
         userService.addWithDefaultRole(user);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(user.getId()).toUri());
-        return new ResponseEntity<String>(headers, HttpStatus.CREATED);
+        return new ResponseEntity<String>(HttpStatus.CREATED);
     }
 }

@@ -29,9 +29,9 @@ import org.hibernate.validator.constraints.NotEmpty;
         @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
         private Set<UserRole> roles = new HashSet<>();
 
-//        @Column
-//        @OneToMany(mappedBy = "user")
-//        private List<Event> events;
+        @Column
+        @OneToMany(mappedBy = "user")
+        private List<Event> events;
 
         public User() {}
 

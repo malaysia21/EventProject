@@ -14,7 +14,9 @@ public interface EventService {
     List<EventDto> findAll();
     EventDto findById(Long id);
 
-    List<Event> findByName(String name);
+    List<EventDto> findByConfirmIsTrue();
+
+    List<EventDto> findByConfirmIsFalse();
 
     void saveEvent(User user, EventDto eventDto);
 
@@ -23,6 +25,8 @@ public interface EventService {
     void deleteEventById(Long id);
 
     boolean isEventExist(EventDto event);
+
+    List<EventDto> findByUser(Long id);
 
 
 }

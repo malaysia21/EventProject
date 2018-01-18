@@ -14,10 +14,12 @@ import java.util.List;
 public interface EventRepository extends CrudRepository<Event, Long>, JpaSpecificationExecutor<Event> {
 
     List<Event> findAll();
-    List<Event> findByNameIgnoreCase(String name);
     Event findById(Long id);
     Event save(Event event);
-    List<Event> findByEventType(EventType eventType);
-    List<Event> findByDate(LocalDate date);
-    List<Event> findByDateBetween(LocalDate date1, LocalDate date2);
+    List<Event> findByConfirmIsTrue();
+    List<Event> findByConfirmIsFalse();
+    Event findByName(String name);
+    List<Event> findByUserId(Long id);
+
+
 }

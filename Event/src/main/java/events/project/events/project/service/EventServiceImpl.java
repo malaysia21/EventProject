@@ -34,10 +34,6 @@ public class EventServiceImpl implements  EventService{
         return toDto.map(eventRepository.findById(id));
     }
 
-    @Override
-    public List<Event> findByName(String name) {
-        return eventRepository.findByNameIgnoreCase(name);
-    }
 
     @Override
     public void saveEvent(User user, EventDto eventDto) {
@@ -69,13 +65,41 @@ public class EventServiceImpl implements  EventService{
         return list;
     }
 
+    @Override
+    public List<EventDto> findByConfirmIsTrue() {
+        List<EventDto> list = new ArrayList<>();
+        for (Event e :eventRepository.findByConfirmIsTrue()) {
+            list.add(toDto.map(e));
+        }
+        return list;
+    }
+
+    @Override
+    public List<EventDto> findByConfirmIsFalse() {
+        List<EventDto> list = new ArrayList<>();
+        for (Event e :eventRepository.findByConfirmIsFalse()) {
+            list.add(toDto.map(e));
+        }
+        return list;
+    }
+
+
     public boolean isEventExist(EventDto event) {
         Event eventEntity = toEntity.map(event);
-        Event eventById = eventRepository.findById(eventEntity.getId());
+        Event eventById = eventRepository.findByName(eventEntity.getName());
 
         if(eventById==null)
               {return false;}
        else {return true;}
+    }
+
+    @Override
+    public List<EventDto> findByUser(Long id) {
+        List<EventDto> list = new ArrayList<>();
+        for (Event e :eventRepository.findByUserId(id)) {
+            list.add(toDto.map(e));
+        }
+        return list;
     }
 
 
