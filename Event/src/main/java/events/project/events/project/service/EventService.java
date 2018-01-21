@@ -20,7 +20,7 @@ public interface EventService {
 
     void saveEvent(User user, EventDto eventDto);
 
-    EventDto updateEvent(EventDto event);
+    void updateEvent(EventDto event);
 
     void deleteEventById(Long id);
 

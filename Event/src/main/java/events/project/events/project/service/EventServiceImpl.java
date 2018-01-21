@@ -23,7 +23,9 @@ public class EventServiceImpl implements  EventService{
     private EventRepository eventRepository;
 
     private EventDtoToEventMapper toEntity = new EventDtoToEventMapper();
+
     private EventToEventDtoMapper toDto = new EventToEventDtoMapper();
+
     @Autowired
     public EventServiceImpl(EventRepository er){
     this.eventRepository=er;
@@ -43,11 +45,11 @@ public class EventServiceImpl implements  EventService{
     }
 
     @Override
-    public EventDto updateEvent(EventDto event) {
+    public void updateEvent(EventDto event) {
         Event eventEntity = toEntity.map(event);
         Event save = eventRepository.save(eventEntity);
-        EventDto eventDto = toDto.map(save);
-        return eventDto;
+        //EventDto eventDto = toDto.map(save);
+        //return eventDto;
     }
 
     @Override

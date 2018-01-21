@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -142,7 +143,7 @@ public class EventController {
      */
 
     @PostMapping(value = "/addEvent", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addEvent(@Valid @RequestBody EventDto event, BindingResult result, UriComponentsBuilder ucBuilder, HttpServletRequest request) {
+    public ResponseEntity<?> addEvent(@Valid @RequestBody EventDto event, BindingResult result, UriComponentsBuilder ucBuilder, @AuthenticationPrincipal final User user, HttpServletRequest request) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
         }
@@ -150,8 +151,9 @@ public class EventController {
             {throw new EventExistException(event);}
 
         Principal principal = request.getUserPrincipal();
-        eventService.saveEvent(userService.findByEmail(principal.getName()), event);
 
+        eventService.saveEvent(userService.findByEmail(principal.getName()), event);
+        //eventService.saveEvent(user, event);
         return new ResponseEntity<String>(HttpStatus.CREATED);
     }
 
@@ -163,14 +165,15 @@ public class EventController {
      */
 
     @PutMapping(value = "/updateEvent/{id}",consumes = MediaType.APPLICATION_JSON_VALUE,  produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateEvent(@PathVariable("id") long id, @Valid @RequestBody EventDto event, BindingResult result) {
-       EventDto currentEvent = eventService.findById(id);
+    public ResponseEntity<?> updateEvent(@PathVariable("id") long id, @Valid @RequestBody EventDto event, BindingResult result, HttpServletRequest request) {
+       Event currentEvent = eventRepository.findById(id);
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
         }
         if (currentEvent == null) {
             {throw new EventNotFoundException(id);}
         }
+        Principal principal = request.getUserPrincipal();
         currentEvent.setName(event.getName());
         currentEvent.setEventType(event.getEventType());
         currentEvent.setDate(event.getDate());
@@ -179,8 +182,11 @@ public class EventController {
         currentEvent.setAdress(event.getAdress());
         currentEvent.setPoint(event.getPoint());
 
-        EventDto updateEvent = eventService.updateEvent(currentEvent);
-        return new ResponseEntity<EventDto>(updateEvent, HttpStatus.OK);
+        User userByEmail = userService.findByEmail(principal.getName());
+        currentEvent.setUser(userByEmail);
+
+        eventRepository.save(currentEvent);
+        return new ResponseEntity<String>(HttpStatus.OK);
     }
 
     /**

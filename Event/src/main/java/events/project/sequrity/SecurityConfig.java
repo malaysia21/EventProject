@@ -28,10 +28,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             http//.formLogin().and()
                 .cors().and().httpBasic().and()
-                .logout().and()
                 .authorizeRequests()
-                    .antMatchers("/addEvent").authenticated().anyRequest().permitAll()
-                    .and()
+                    .antMatchers("/allConfirmedEvents", "/addUser").permitAll().
+                    anyRequest().authenticated()
+                    .and().logout().and()
                 .csrf().disable();
     }
 
