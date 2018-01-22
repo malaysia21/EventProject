@@ -38,18 +38,19 @@ public class EventServiceImpl implements  EventService{
 
 
     @Override
-    public void saveEvent(User user, EventDto eventDto) {
+    public EventDto saveEvent(User user, EventDto eventDto) {
         Event event = toEntity.map(eventDto);
         event.setUser(user);
-        eventRepository.save(event);
+        Event save = eventRepository.save(event);
+        EventDto eventDtoReturned = toDto.map(save);
+        return eventDtoReturned;
     }
 
     @Override
-    public void updateEvent(EventDto event) {
-        Event eventEntity = toEntity.map(event);
-        Event save = eventRepository.save(eventEntity);
-        //EventDto eventDto = toDto.map(save);
-        //return eventDto;
+    public EventDto updateEvent(Event event) {
+        Event save = eventRepository.save(event);
+        EventDto eventDto = toDto.map(save);
+        return eventDto;
     }
 
     @Override

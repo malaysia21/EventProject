@@ -143,18 +143,14 @@ public class EventController {
      */
 
     @PostMapping(value = "/addEvent", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addEvent(@Valid @RequestBody EventDto event, BindingResult result, UriComponentsBuilder ucBuilder, @AuthenticationPrincipal final User user, HttpServletRequest request) {
+    public ResponseEntity<?> addEvent(@Valid @RequestBody EventDto event, BindingResult result,Principal user) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
         }
         if (eventService.isEventExist(event))
             {throw new EventExistException(event);}
-
-        Principal principal = request.getUserPrincipal();
-
-        eventService.saveEvent(userService.findByEmail(principal.getName()), event);
-        //eventService.saveEvent(user, event);
-        return new ResponseEntity<String>(HttpStatus.CREATED);
+        EventDto eventDto = eventService.saveEvent(userService.findByEmail(user.getName()), event);
+        return new ResponseEntity<EventDto>(eventDto, HttpStatus.CREATED);
     }
 
     /**
@@ -165,7 +161,7 @@ public class EventController {
      */
 
     @PutMapping(value = "/updateEvent/{id}",consumes = MediaType.APPLICATION_JSON_VALUE,  produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateEvent(@PathVariable("id") long id, @Valid @RequestBody EventDto event, BindingResult result, HttpServletRequest request) {
+    public ResponseEntity<?> updateEvent(@PathVariable("id") long id, @Valid @RequestBody EventDto event, BindingResult result, Principal user) {
        Event currentEvent = eventRepository.findById(id);
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
@@ -173,7 +169,6 @@ public class EventController {
         if (currentEvent == null) {
             {throw new EventNotFoundException(id);}
         }
-        Principal principal = request.getUserPrincipal();
         currentEvent.setName(event.getName());
         currentEvent.setEventType(event.getEventType());
         currentEvent.setDate(event.getDate());
@@ -182,11 +177,9 @@ public class EventController {
         currentEvent.setAdress(event.getAdress());
         currentEvent.setPoint(event.getPoint());
 
-        User userByEmail = userService.findByEmail(principal.getName());
-        currentEvent.setUser(userByEmail);
+        EventDto eventDto = eventService.updateEvent(currentEvent);
 
-        eventRepository.save(currentEvent);
-        return new ResponseEntity<String>(HttpStatus.OK);
+        return new ResponseEntity<EventDto>(eventDto,HttpStatus.OK);
     }
 
     /**

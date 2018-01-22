@@ -18,9 +18,9 @@ public interface EventService {
 
     List<EventDto> findByConfirmIsFalse();
 
-    void saveEvent(User user, EventDto eventDto);
+    EventDto saveEvent(User user, EventDto eventDto);
 
-    void updateEvent(EventDto event);
+    EventDto updateEvent(Event event);
 
     void deleteEventById(Long id);
 
