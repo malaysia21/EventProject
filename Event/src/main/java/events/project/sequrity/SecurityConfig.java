@@ -26,12 +26,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-            http//.formLogin().and()
+            http.formLogin().and()
                 .cors().and().httpBasic().and()
                 .authorizeRequests()
                     .antMatchers("/allConfirmedEvents", "/addUser").permitAll().
                     anyRequest().authenticated()
                     .and().logout().and()
+                //.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
                 .csrf().disable();
     }
 
