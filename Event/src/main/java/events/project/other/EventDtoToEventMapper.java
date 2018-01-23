@@ -1,6 +1,5 @@
 package events.project.other;
 
-import events.project.controller.EventNotFoundException;
 import events.project.model.Event;
 import events.project.model.EventDto;
 
@@ -9,7 +8,7 @@ public class EventDtoToEventMapper implements Mapper<EventDto,Event> {
     public Event map(EventDto event) {
              return Event.New().name(event.getName()).
                 eventType(event.getEventType()).point(event.getPoint()).
-                address(event.getAdress()).startingTime(event.getStartingTime()).
+                address(event.getAddress()).startingTime(event.getStartingTime()).
         endingTime(event.getEndingTime()).date(event.getDate()).bulid();
     }
 }

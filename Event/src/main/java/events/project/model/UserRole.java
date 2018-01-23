@@ -1,4 +1,4 @@
-package events.project.users;
+package events.project.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

@@ -2,12 +2,10 @@ package events.project.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import events.project.users.User;
 import events.project.validation.CustomDateDeserializer;
 import events.project.validation.CustomLocalDateTimeSerializer;
 import events.project.validation.EventTypeConstraint;
 import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -39,7 +37,7 @@ public class Event  implements Serializable {
     private Point point;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    private Adress adress;
+    private Address address;
 
     @Column(name="startingTime")
     @NotNull(message = "Starting time may not be null")
@@ -66,11 +64,11 @@ public class Event  implements Serializable {
     }
 
 
-    public Event(String name, String eventType, Point point, Adress adress, LocalTime startingTime, LocalTime endingTime, LocalDate date) {
+    public Event(String name, String eventType, Point point, Address address, LocalTime startingTime, LocalTime endingTime, LocalDate date) {
         this.name = name;
         this.eventType = eventType;
         this.point = point;
-        this.adress = adress;
+        this.address = address;
         this.startingTime = startingTime;
         this.endingTime = endingTime;
         this.date = date;
@@ -79,11 +77,11 @@ public class Event  implements Serializable {
     }
 
 
-    public Event(String name, String eventType, Point point, Adress adress, LocalTime startingTime, LocalTime endingTime, LocalDate date, User user) {
+    public Event(String name, String eventType, Point point, Address address, LocalTime startingTime, LocalTime endingTime, LocalDate date, User user) {
         this.name = name;
         this.eventType = eventType;
         this.point = point;
-        this.adress = adress;
+        this.address = address;
         this.startingTime = startingTime;
         this.endingTime = endingTime;
         this.date = date;
@@ -99,12 +97,12 @@ public class Event  implements Serializable {
         this.point = point;
     }
 
-    public Adress getAdress() {
-        return adress;
+    public Address getAddress() {
+        return address;
     }
 
-    public void setAdress(Adress adress) {
-        this.adress = adress;
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
     public Long getId() {
@@ -209,8 +207,8 @@ public class Event  implements Serializable {
             return this;
         }
 
-        public Event.EventBuilder address(Adress address){
-            event.adress=address;
+        public Event.EventBuilder address(Address address){
+            event.address =address;
             return this;
         }
 

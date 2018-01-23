@@ -1,4 +1,4 @@
-package events.project.users;
+package events.project.model;
 
 import java.util.HashSet;
 import java.util.List;
@@ -6,7 +6,6 @@ import java.util.Set;
 
 import javax.persistence.*;
 
-import events.project.model.Event;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -95,6 +94,41 @@ import org.hibernate.validator.constraints.NotEmpty;
                     + ", email=" + email
                     + ", password=" + password
                     + ", roles=" + roles + "]";
+        }
+
+        public static User.UserBuilder New() {
+            return new User.UserBuilder();
+        }
+
+        public static class UserBuilder {
+
+            private User user;
+
+            private UserBuilder() {
+                user = new User();
+            }
+
+            public User.UserBuilder firstName(String firstName) {
+                user.firstName = firstName;
+                return this;
+            }
+
+            public User.UserBuilder lastName(String lastName) {
+                user.lastName = lastName;
+                return this;
+            }
+            public User.UserBuilder email(String email) {
+                user.email = email;
+                return this;
+            }
+
+            public User.UserBuilder password(String password) {
+                user.password = password;
+                return this;
+            }
+            public User bulid() {
+                return user;
+            }
         }
     }
 

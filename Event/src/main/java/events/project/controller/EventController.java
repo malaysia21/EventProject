@@ -1,30 +1,21 @@
 package events.project.controller;
 
 
-import events.project.events.project.service.AdressServiceImpl;
 import events.project.model.*;
 import events.project.other.CustomErrorType;
-import events.project.events.project.service.PointServiceImpl;
 import events.project.specification.EventSpecification;
-import events.project.users.User;
-import events.project.users.UserService;
+import events.project.service.UserService;
 import events.project.validation.ValidationErrorBuilder;
-import events.project.events.project.service.EventServiceImpl;
+import events.project.service.EventServiceImpl;
 import events.project.repositories.EventRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
@@ -37,8 +28,7 @@ import java.util.List;
 public class EventController {
 
     private EventServiceImpl eventService;
-    private PointServiceImpl pointService;
-    private AdressServiceImpl adressService;
+
 
     @Autowired
     private EventRepository eventRepository;
@@ -47,11 +37,8 @@ public class EventController {
     private UserService userService;
 
     @Autowired
-    public EventController(EventServiceImpl es, PointServiceImpl ps, AdressServiceImpl as){
+    public EventController(EventServiceImpl es ){
         this.eventService=es;
-        this.pointService=ps;
-        this.adressService=as;
-
     }
 
     @ExceptionHandler(EventNotFoundException.class)
@@ -161,23 +148,16 @@ public class EventController {
      */
 
     @PutMapping(value = "/updateEvent/{id}",consumes = MediaType.APPLICATION_JSON_VALUE,  produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateEvent(@PathVariable("id") long id, @Valid @RequestBody EventDto event, BindingResult result, Principal user) {
-       Event currentEvent = eventRepository.findById(id);
+    public ResponseEntity<?> updateEvent(@PathVariable("id") Long id, @Valid @RequestBody EventDto event, BindingResult result, Principal user) {
+       EventDto currentEvent = eventService.findById(id);
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
         }
         if (currentEvent == null) {
             {throw new EventNotFoundException(id);}
         }
-        currentEvent.setName(event.getName());
-        currentEvent.setEventType(event.getEventType());
-        currentEvent.setDate(event.getDate());
-        currentEvent.setStartingTime(event.getStartingTime());
-        currentEvent.setEndingTime(event.getEndingTime());
-        currentEvent.setAdress(event.getAdress());
-        currentEvent.setPoint(event.getPoint());
 
-        EventDto eventDto = eventService.updateEvent(currentEvent);
+        EventDto eventDto = eventService.updateEvent(id, event);
 
         return new ResponseEntity<EventDto>(eventDto,HttpStatus.OK);
     }

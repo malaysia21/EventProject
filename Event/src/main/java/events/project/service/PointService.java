@@ -1,4 +1,4 @@
-package events.project.events.project.service;
+package events.project.service;
 
 import events.project.model.Event;
 import events.project.model.Point;

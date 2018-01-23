@@ -1,7 +1,7 @@
 package events.project.repositories;
 
 
-import events.project.model.Point;
+import events.project.model.Address;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -9,10 +9,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PointRepository extends CrudRepository<Point, Long>, JpaSpecificationExecutor<Point> {
+public interface AddressRepository extends CrudRepository<Address, Long>, JpaSpecificationExecutor<Address> {
 
     @Query(
-            value = "select * from point where dl=:dl and sz=:sz",
+            value = "select * from adress where city=:city and number=:number and street=:street",
             nativeQuery = true)
-    Point checkIfExist(@Param("dl") Float dl, @Param("sz") Float sz);
+    Address checkIfExist(@Param("city") String city, @Param("street") String street, @Param("number") int number);
+
 }

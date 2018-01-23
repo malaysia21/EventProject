@@ -1,6 +1,6 @@
-package events.project.users;
+package events.project.controller;
 
-import events.project.model.Event;
+import events.project.model.User;
 
 public class UserExistException extends RuntimeException {
 

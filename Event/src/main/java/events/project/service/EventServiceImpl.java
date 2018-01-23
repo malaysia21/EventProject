@@ -1,17 +1,18 @@
-package events.project.events.project.service;
+package events.project.service;
 
 
 import events.project.model.*;
 import events.project.other.EventDtoToEventMapper;
 import events.project.other.EventToEventDtoMapper;
+import events.project.repositories.AddressRepository;
 import events.project.repositories.EventRepository;
-import events.project.users.User;
+import events.project.repositories.PointRepository;
+import events.project.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,16 +20,25 @@ import java.util.List;
 @Transactional
 public class EventServiceImpl implements  EventService{
 
-
+    @Autowired
     private EventRepository eventRepository;
+    @Autowired
+    private AddressRepository addressRepository;
+
+    @Autowired
+    private PointRepository pointRepository;
+
 
     private EventDtoToEventMapper toEntity = new EventDtoToEventMapper();
 
     private EventToEventDtoMapper toDto = new EventToEventDtoMapper();
 
     @Autowired
-    public EventServiceImpl(EventRepository er){
+    public EventServiceImpl(EventRepository er, AddressRepository ar, PointRepository pr){
     this.eventRepository=er;
+    this.addressRepository =ar;
+    this.pointRepository=pr;
+
 }
 
     @Override
@@ -47,10 +57,36 @@ public class EventServiceImpl implements  EventService{
     }
 
     @Override
-    public EventDto updateEvent(Event event) {
-        Event save = eventRepository.save(event);
-        EventDto eventDto = toDto.map(save);
-        return eventDto;
+    public EventDto updateEvent(Long id, EventDto eventDto) {
+        Event event = eventRepository.findById(id);
+
+        Address address = addressRepository.checkIfExist(eventDto.getAddress().getCity(),
+                eventDto.getAddress().getStreet(),
+                eventDto.getAddress().getNumber());
+
+        if (address ==null){
+            event.setAddress(eventDto.getAddress());
+        }
+        else event.setAddress(address);
+
+        Point point = pointRepository.checkIfExist(eventDto.getPoint().getLongitude(),
+                eventDto.getPoint().getLatitude());
+
+        if (point==null){
+            event.setPoint(eventDto.getPoint());
+        }
+        else event.setPoint(point);
+
+        event.setName(eventDto.getName());
+        event.setEventType(eventDto.getEventType());
+        event.setDate(eventDto.getDate());
+        event.setStartingTime(eventDto.getStartingTime());
+        event.setEndingTime(eventDto.getEndingTime());
+
+
+        Event saveEvent = eventRepository.save(event);
+        EventDto eventDtoRetun = toDto.map(saveEvent);
+        return eventDtoRetun;
     }
 
     @Override

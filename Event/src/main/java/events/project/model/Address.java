@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-public class Adress {
+public class Address {
 
     @Id
     @GeneratedValue
@@ -18,16 +18,16 @@ public class Adress {
     private int number;
 
     @Column
-    @OneToMany(mappedBy = "adress")
+    @OneToMany(mappedBy = "address")
     private List<Event> events;
 
-    public Adress(String street, String city, int number) {
+    public Address(String street, String city, int number) {
         this.street = street;
         this.city = city;
         this.number = number;
     }
 
-    public Adress() {
+    public Address() {
 
     }
 

@@ -2,14 +2,11 @@ package events.project.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import events.project.users.User;
 import events.project.validation.CustomDateDeserializer;
 import events.project.validation.CustomLocalDateTimeSerializer;
 import events.project.validation.EventTypeConstraint;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.stereotype.Component;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -27,7 +24,7 @@ public class EventDto implements Serializable {
 
     private Point point;
 
-    private Adress adress;
+    private Address address;
 
     @NotNull(message = "Starting time cannot be empty")
     private LocalTime startingTime;
@@ -48,22 +45,22 @@ public class EventDto implements Serializable {
     }
 
 
-    public EventDto(String name, String eventType, Point point, Adress adress, LocalTime startingTime, LocalTime endingTime, LocalDate date) {
+    public EventDto(String name, String eventType, Point point, Address address, LocalTime startingTime, LocalTime endingTime, LocalDate date) {
         this.name = name;
         this.eventType = eventType;
         this.point = point;
-        this.adress = adress;
+        this.address = address;
         this.startingTime = startingTime;
         this.endingTime = endingTime;
         this.date = date;
     }
 
-    public EventDto(String name, String eventType, Point point, Adress adress,
+    public EventDto(String name, String eventType, Point point, Address address,
                     LocalTime startingTime, LocalTime endingTime, LocalDate date, Long userId, boolean confirm) {
         this.name = name;
         this.eventType = eventType;
         this.point = point;
-        this.adress = adress;
+        this.address = address;
         this.startingTime = startingTime;
         this.endingTime = endingTime;
         this.date = date;
@@ -80,12 +77,12 @@ public class EventDto implements Serializable {
         this.point = point;
     }
 
-    public Adress getAdress() {
-        return adress;
+    public Address getAddress() {
+        return address;
     }
 
-    public void setAdress(Adress adress) {
-        this.adress = adress;
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
     public String getName() {
@@ -182,8 +179,8 @@ public class EventDto implements Serializable {
             return this;
         }
 
-        public EventDto.EventBuilder address(Adress address) {
-            event.adress = address;
+        public EventDto.EventBuilder address(Address address) {
+            event.address = address;
             return this;
         }
 

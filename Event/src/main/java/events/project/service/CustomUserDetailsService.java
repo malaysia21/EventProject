@@ -1,6 +1,8 @@
-package events.project.users;
+package events.project.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import events.project.model.User;
+import events.project.model.UserRole;
+import events.project.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
