@@ -1,16 +1,17 @@
 package events.project.controller;
 
 import events.project.model.User;
+import events.project.model.UserDto;
 
 public class UserExistException extends RuntimeException {
 
-    private User user;
+    private UserDto user;
 
-    public UserExistException(User user) {
+    public UserExistException(UserDto user) {
         this.user = user;
     }
 
-    public User getUser() {
+    public UserDto getUser() {
         return user;
     }
 

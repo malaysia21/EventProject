@@ -1,6 +1,11 @@
 package events.project.service;
 
 import events.project.model.User;
+import events.project.model.UserDto;
+import events.project.other.EventDtoToEventMapper;
+import events.project.other.EventToEventDtoMapper;
+import events.project.other.UserDtoToUserMapper;
+import events.project.other.UserToUserDtoMapper;
 import events.project.repositories.UserRepository;
 import events.project.model.UserRole;
 import events.project.repositories.UserRoleRepository;
@@ -23,7 +28,12 @@ public class UserServiceImpl implements UserService{
     private static final String DEFAULT_ROLE = "ROLE_USER";
     private UserRepository userRepository;
     private UserRoleRepository roleRepository;
+    
 
+    private UserToUserDtoMapper toUserDto = new UserToUserDtoMapper();
+
+    private UserDtoToUserMapper toUser = new UserDtoToUserMapper();
+    
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -38,7 +48,8 @@ public class UserServiceImpl implements UserService{
     private AuthenticationManager authenticationManager;
 
     @Override
-    public void addWithDefaultRole(User user) {
+    public void addWithDefaultRole(UserDto userDto) {
+        User user = toUser.map(userDto);
         UserRole defaultRole = roleRepository.findByRole(DEFAULT_ROLE);
         user.getRoles().add(defaultRole);
         userRepository.save(user);
@@ -50,7 +61,8 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public boolean isUserExist(User user){
+    public boolean isUserExist(UserDto userDto){
+        User user = toUser.map(userDto);
         for (User u: userRepository.findAll())
             if (u.getEmail().equals(user.getEmail())){
                 return true;}
@@ -63,7 +75,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void logoutUser(User sessionUser, HttpSession httpSession) {
+    public void logoutUser(HttpSession httpSession) {
         if (httpSession != null) {
             httpSession.invalidate();
         }
@@ -72,14 +84,12 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public boolean login(String login, String password, HttpServletRequest request) {
+    public boolean login(String login, String password) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
         boolean isAuthenticated = isAuthenticated(authentication);
         if (isAuthenticated) {
             SecurityContext context = SecurityContextHolder.getContext();
             context.setAuthentication(authentication);
-            HttpSession session = request.getSession(true);
-            session.setAttribute("SPRING_SECURITY_CONTEXT", context);
         }
         return isAuthenticated;
     }

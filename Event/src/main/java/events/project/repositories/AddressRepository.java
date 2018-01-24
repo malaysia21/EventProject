@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 public interface AddressRepository extends CrudRepository<Address, Long>, JpaSpecificationExecutor<Address> {
 
     @Query(
-            value = "select * from adress where city=:city and number=:number and street=:street",
+            value = "select * from address where city=:city and number=:number and street=:street",
             nativeQuery = true)
     Address checkIfExist(@Param("city") String city, @Param("street") String street, @Param("number") int number);
 

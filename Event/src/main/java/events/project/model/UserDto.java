@@ -3,20 +3,9 @@ package events.project.model;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.persistence.*;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-
-@Entity
 public class UserDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
     @NotEmpty (message = "First name may not be empty")
     private String firstName;
     @NotEmpty(message = "Last name may not be empty")
@@ -26,12 +15,8 @@ public class UserDto {
     private String email;
     @NotEmpty (message = "Password may not be empty")
     private String password;
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-    private Set<UserRole> roles = new HashSet<>();
 
-    @Column
-    @OneToMany(mappedBy = "user")
-    private List<Event> events;
+
 
     public UserDto() {}
 
@@ -42,12 +27,6 @@ public class UserDto {
         this.password = password;
     }
 
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
     public String getFirstName() {
         return firstName;
     }
@@ -72,9 +51,7 @@ public class UserDto {
     public void setPassword(String password) {
         this.password = password;
     }
-    public Set<UserRole> getRoles() {
-        return roles;
-    }
+
 
 //        public List<Event> getEvents() {
 //            return events;
@@ -84,17 +61,15 @@ public class UserDto {
 //            this.events = events;
 //        }
 
-    public void setRoles(Set<UserRole> roles) {
-        this.roles = roles;
-    }
+
     @Override
     public String toString() {
-        return "User [id=" + id
+        return "User ["
                 + ", firstName=" + firstName
                 + ", lastName=" + lastName
                 + ", email=" + email
                 + ", password=" + password
-                + ", roles=" + roles + "]";
+                +  "]";
     }
 
     public static UserDto.UserBuilder New() {

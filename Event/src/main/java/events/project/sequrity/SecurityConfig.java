@@ -22,9 +22,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
             http.formLogin().and()
-                .cors().and().httpBasic().and()
+       .cors().and().httpBasic().and()
                 .authorizeRequests()
-                    .antMatchers("/allConfirmedEvents", "/addUser", "/logUser","/logUser2").permitAll().
+                    .antMatchers("/allConfirmedEvents", "/addUser", "/logUser","/logUserTest").permitAll().
                     anyRequest().authenticated()
                     .and().logout().and()
                 //.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());

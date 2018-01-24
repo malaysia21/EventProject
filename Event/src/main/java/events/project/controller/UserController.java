@@ -1,4 +1,5 @@
 package events.project.controller;
+import events.project.model.UserDto;
 import events.project.other.CustomErrorType;
 import events.project.model.User;
 import events.project.service.UserServiceImpl;
@@ -39,7 +40,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/addUser", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addUser(@Valid @RequestBody User user, BindingResult result, UriComponentsBuilder ucBuilder) {
+    public ResponseEntity<?> addUser(@Valid @RequestBody UserDto user, BindingResult result, UriComponentsBuilder ucBuilder) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
         }
@@ -58,20 +59,29 @@ public class UserController {
 
 
     @GetMapping(value = "/logoutUser", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity logout(@AuthenticationPrincipal User sessionUser, HttpServletRequest httpRequest) {
-        userService.logoutUser(sessionUser, httpRequest.getSession(false));
+    public ResponseEntity logout(HttpServletRequest httpRequest) {
+        userService.logoutUser(httpRequest.getSession(false));
         return noContent().build();
     }
 
 
-    @GetMapping(value = "/logUser", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> login(@RequestParam String name, @RequestParam String password, HttpServletRequest request) {
-        boolean login = userService.login(name, password, request);
+    @GetMapping(value = "/logUserTest", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> loginTest(@RequestParam String name, @RequestParam String password) {
+        boolean login = userService.login(name, password);
         if (login = true) {
             return new ResponseEntity<String>(HttpStatus.OK);
         } else return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
     }
 
+
+
+    @PostMapping(value = "/logUser", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> login(@RequestBody String name, String password ) {
+        boolean login = userService.login(name, password);
+        if (login == true) {
+            return new ResponseEntity<String>(HttpStatus.OK);
+        } else return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
+    }
 
 }
 

@@ -51,6 +51,26 @@ public class EventServiceImpl implements  EventService{
     public EventDto saveEvent(User user, EventDto eventDto) {
         Event event = toEntity.map(eventDto);
         event.setUser(user);
+
+        Address address = addressRepository.checkIfExist(eventDto.getAddress().getCity(),
+                eventDto.getAddress().getStreet(),
+                eventDto.getAddress().getNumber());
+
+        if (address ==null){
+            event.setAddress(eventDto.getAddress());
+        }
+        else event.setAddress(address);
+
+        Point point = pointRepository.checkIfExist(eventDto.getPoint().getLongitude(),
+                eventDto.getPoint().getLatitude());
+
+        if (point==null){
+            event.setPoint(eventDto.getPoint());
+        }
+        else event.setPoint(point);
+
+
+
         Event save = eventRepository.save(event);
         EventDto eventDtoReturned = toDto.map(save);
         return eventDtoReturned;

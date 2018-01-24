@@ -19,7 +19,6 @@ public class EventApplication {
 
 
 	public void run(String... arg) throws Exception {
-		//storageService.deleteAll();
 		storageService.init();
 	}
 
