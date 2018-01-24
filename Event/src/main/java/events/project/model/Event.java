@@ -17,37 +17,37 @@ import java.time.LocalTime;
 
 @Entity
 @Component
-@Table(name="events")
-public class Event  implements Serializable {
+@Table(name = "events")
+public class Event implements Serializable {
 
     @Id
     @GeneratedValue
     private Long id;
 
-    @Column(name="name")
+    @Column(name = "name")
     @NotBlank(message = "Name may not be null")
     private String name;
 
-    @Column(name="type")
+    @Column(name = "type")
     @EventTypeConstraint(enumClass = EventType.class, ignoreCase = true)
     @NotNull(message = "Event type may not be null")
     private String eventType;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Point point;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     private Address address;
 
-    @Column(name="startingTime")
+    @Column(name = "startingTime")
     @NotNull(message = "Starting time may not be null")
     private LocalTime startingTime;
 
-    @Column(name="endingTime")
+    @Column(name = "endingTime")
     @NotNull(message = "Ending time may not be null")
     private LocalTime endingTime;
 
-    @Column(name="date")
+    @Column(name = "date")
     @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
     @JsonDeserialize(using = CustomDateDeserializer.class)
     @NotNull(message = "Date may not be null")
@@ -56,7 +56,7 @@ public class Event  implements Serializable {
     @ManyToOne
     private User user;
 
-    @Column(name="confirmation")
+    @Column(name = "confirmation")
     private boolean confirm;
 
 
@@ -181,54 +181,55 @@ public class Event  implements Serializable {
                 '}';
     }
 
-    public static EventBuilder New(){
+    public static EventBuilder New() {
         return new Event.EventBuilder();
     }
-    public static class EventBuilder{
+
+    public static class EventBuilder {
 
         private Event event;
 
-        private EventBuilder(){
+        private EventBuilder() {
             event = new Event();
         }
 
-        public Event.EventBuilder name(String name){
-            event.name=name;
+        public Event.EventBuilder name(String name) {
+            event.name = name;
             return this;
         }
 
-        public Event.EventBuilder eventType(String eventType){
-            event.eventType=eventType;
+        public Event.EventBuilder eventType(String eventType) {
+            event.eventType = eventType;
             return this;
         }
 
-        public Event.EventBuilder point(Point point){
-            event.point=point;
+        public Event.EventBuilder point(Point point) {
+            event.point = point;
             return this;
         }
 
-        public Event.EventBuilder address(Address address){
-            event.address =address;
+        public Event.EventBuilder address(Address address) {
+            event.address = address;
             return this;
         }
 
-        public Event.EventBuilder startingTime(LocalTime startingTime){
-            event.startingTime=startingTime;
+        public Event.EventBuilder startingTime(LocalTime startingTime) {
+            event.startingTime = startingTime;
             return this;
         }
 
-             public Event.EventBuilder endingTime(LocalTime endingTime){
-            event.endingTime=endingTime;
+        public Event.EventBuilder endingTime(LocalTime endingTime) {
+            event.endingTime = endingTime;
             return this;
         }
 
-        public Event.EventBuilder date(LocalDate date){
-            event.date=date;
+        public Event.EventBuilder date(LocalDate date) {
+            event.date = date;
             return this;
         }
 
 
-        public Event bulid() {
+        public Event build() {
             return event;
         }
     }

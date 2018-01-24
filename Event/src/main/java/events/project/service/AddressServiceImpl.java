@@ -12,12 +12,11 @@ public class AddressServiceImpl implements AddressService {
 
 
     private AddressRepository addressRepository;
+
     @Autowired
-    public AddressServiceImpl(AddressRepository ar){
-        this.addressRepository =ar;
+    public AddressServiceImpl(AddressRepository ar) {
+        this.addressRepository = ar;
     }
 
-
-   
 
 }

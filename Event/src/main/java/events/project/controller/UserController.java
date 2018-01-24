@@ -1,7 +1,7 @@
 package events.project.controller;
+
 import events.project.model.UserDto;
 import events.project.other.CustomErrorType;
-import events.project.model.User;
 import events.project.service.UserServiceImpl;
 import events.project.validation.ValidationErrorBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -74,9 +74,8 @@ public class UserController {
     }
 
 
-
     @PostMapping(value = "/logUser", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> login(@RequestBody String name, String password ) {
+    public ResponseEntity<?> login(@RequestBody String name, String password) {
         boolean login = userService.login(name, password);
         if (login == true) {
             return new ResponseEntity<String>(HttpStatus.OK);

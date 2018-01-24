@@ -18,7 +18,7 @@ public class MyConfiguration {
                 registry.addMapping("/**")
                         //.allowedOrigins("http://domain2.com")
                         .allowedMethods("PUT", "DELETE", "POST", "GET")
-                       .allowedHeaders("/**")
+                        .allowedHeaders("/**")
                         .exposedHeaders("/**")
                         .allowCredentials(false).maxAge(3600);
             }

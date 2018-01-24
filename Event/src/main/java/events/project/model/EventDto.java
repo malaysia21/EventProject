@@ -13,8 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 
-
-public class EventDto implements Serializable {
+public class EventDto {
 
     @NotBlank(message = "Name cannot be empty!")
     private String name;
@@ -200,18 +199,18 @@ public class EventDto implements Serializable {
         }
 
 
-
-        public EventDto.EventBuilder userId(Long userId){
-            event.userId=userId;
+        public EventDto.EventBuilder userId(Long userId) {
+            event.userId = userId;
             return this;
         }
 
-        public EventDto.EventBuilder confirm(boolean confirm){
-            event.confirm=confirm;
+
+        public EventDto.EventBuilder confirm(boolean confirm) {
+            event.confirm = confirm;
             return this;
         }
 
-        public EventDto bulid() {
+        public EventDto build() {
             return event;
         }
     }

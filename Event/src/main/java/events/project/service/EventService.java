@@ -9,6 +9,7 @@ import java.util.List;
 public interface EventService {
 
     List<EventDto> findAll();
+
     EventDto findById(Long id);
 
     List<EventDto> findByConfirmIsTrue();

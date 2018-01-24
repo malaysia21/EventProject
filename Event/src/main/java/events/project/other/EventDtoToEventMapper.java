@@ -9,6 +9,6 @@ public class EventDtoToEventMapper implements Mapper<EventDto,Event> {
              return Event.New().name(event.getName()).
                 eventType(event.getEventType()).point(event.getPoint()).
                 address(event.getAddress()).startingTime(event.getStartingTime()).
-        endingTime(event.getEndingTime()).date(event.getDate()).bulid();
+        endingTime(event.getEndingTime()).date(event.getDate()).build();
     }
 }

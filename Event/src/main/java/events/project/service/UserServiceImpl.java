@@ -23,17 +23,17 @@ import javax.servlet.http.HttpSession;
 
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private static final String DEFAULT_ROLE = "ROLE_USER";
     private UserRepository userRepository;
     private UserRoleRepository roleRepository;
-    
+
 
     private UserToUserDtoMapper toUserDto = new UserToUserDtoMapper();
 
     private UserDtoToUserMapper toUser = new UserDtoToUserMapper();
-    
+
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -61,13 +61,16 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public boolean isUserExist(UserDto userDto){
+    public boolean isUserExist(UserDto userDto) {
         User user = toUser.map(userDto);
-        for (User u: userRepository.findAll())
-            if (u.getEmail().equals(user.getEmail())){
-                return true;}
+        for (User u : userRepository.findAll())
+            if (u.getEmail().equals(user.getEmail())) {
+                return true;
+            }
         return false;
-    };
+    }
+
+
 
     @Override
     public boolean isAuthenticated(Authentication authentication) {
@@ -93,7 +96,6 @@ public class UserServiceImpl implements UserService{
         }
         return isAuthenticated;
     }
-
 
 
 }

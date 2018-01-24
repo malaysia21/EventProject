@@ -9,18 +9,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service("pointService")
 @Transactional
-public class PointServiceImpl implements  PointService{
+public class PointServiceImpl implements PointService {
 
 
     private PointRepository pointRepository;
+
     @Autowired
-    public PointServiceImpl(PointRepository pr){
-        this.pointRepository=pr;
+    public PointServiceImpl(PointRepository pr) {
+        this.pointRepository = pr;
     }
 
     @Override
     public void savePoint(Point point) {
-        {pointRepository.save(point);
+        {
+            pointRepository.save(point);
         }
     }
 }

@@ -12,19 +12,20 @@ public class Point {
     @GeneratedValue
     private Long id;
 
-    @Digits(integer = 11, fraction=6)
-    @Column(name="dl")
+    @Digits(integer = 11, fraction = 6)
+    @Column(name = "dl")
     private Float longitude;
 
-    @Digits(integer = 11, fraction=6)
-    @Column(name="sz")
+    @Digits(integer = 11, fraction = 6)
+    @Column(name = "sz")
     private Float latitude;
 
     @Column
     @OneToMany(mappedBy = "point")
     private List<Event> events;
 
-    public Point() {}
+    public Point() {
+    }
 
     public Point(Float longitude, Float latitude) {
         this.longitude = longitude;

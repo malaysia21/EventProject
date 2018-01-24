@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 public interface PointRepository extends CrudRepository<Point, Long>, JpaSpecificationExecutor<Point> {
 
     @Query(
-            value = "select * from point where dl-:dl<=0.000001 and sz-:sz<=0.000001",
+            value = "select * from point where ABS(dl-:dl)<=0.000001 and ABS(sz-:sz)<=0.000001",
             nativeQuery = true)
-    Point checkIfExist(  @Param("dl") Float dl, @Param("sz") Float sz);
+    Point checkIfExist(@Param("dl") Float dl, @Param("sz") Float sz);
 }

@@ -10,16 +10,16 @@ import javax.annotation.Resource;
 @SpringBootApplication
 public class EventApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(EventApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(EventApplication.class, args);
+    }
 
-	@Resource
-	StorageService storageService;
+    @Resource
+    StorageService storageService;
 
 
-	public void run(String... arg) throws Exception {
-		storageService.init();
-	}
+    public void run(String... arg) throws Exception {
+        storageService.init();
+    }
 
 }
