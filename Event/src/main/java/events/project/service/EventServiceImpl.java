@@ -1,13 +1,17 @@
 package events.project.service;
 
 
-import events.project.model.*;
+import events.project.controller.EventNotFoundException;
+import events.project.model.Address;
+import events.project.model.Event;
+import events.project.model.EventDto;
+import events.project.model.Point;
+import events.project.model.User;
 import events.project.other.EventDtoToEventMapper;
 import events.project.other.EventToEventDtoMapper;
 import events.project.repositories.AddressRepository;
 import events.project.repositories.EventRepository;
 import events.project.repositories.PointRepository;
-import events.project.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -15,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service("eventService")
 @Transactional
@@ -37,7 +42,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventDto findById(Long id) {
-        return toDto.map(eventRepository.findById(id));
+        return Optional.ofNullable(toDto.map(eventRepository.findById(id)))
+                .orElseThrow(() -> new EventNotFoundException(id));
     }
 
 

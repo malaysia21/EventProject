@@ -3,7 +3,11 @@ package events.project.validation;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 
-public class ValidationErrorBuilder {
+public final class ValidationErrorBuilder {
+
+    private ValidationErrorBuilder() {
+    }
+
     public static ValidationError fromBindingErrors(Errors errors) {
         ValidationError error = new ValidationError("Validation failed. " + errors.getErrorCount() + " error(s)");
         for (ObjectError objectError : errors.getAllErrors()) {
@@ -11,4 +15,5 @@ public class ValidationErrorBuilder {
         }
         return error;
     }
+
 }
