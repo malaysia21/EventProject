@@ -2,6 +2,7 @@ package events.project.specification;
 
 import events.project.model.Event;
 import events.project.model.Point;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Predicate;
@@ -9,7 +10,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Log4j2
 public class EventSpecification {
 
     public static Specification<Event> withDynamicQuery(String name, String eventType, LocalDate date1, LocalDate date2,
@@ -39,6 +40,10 @@ public class EventSpecification {
             Predicate[] predicatesArray = new Predicate[predicates.size()];
             return builder.and(predicates.toArray(predicatesArray));
         };
+    }
+
+    public static void main(String[] args) {
+        log.debug("siemanko, witam");
     }
 
 }
