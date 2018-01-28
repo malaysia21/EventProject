@@ -3,7 +3,10 @@ package events.project.validation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-
+/**
+ * Walidator dla typu wyliczeniowego EventType
+ * @version 1.1
+ */
 public class EventTypeValidator implements ConstraintValidator<EventTypeConstraint, String> {
 
     private EventTypeConstraint annotation;

@@ -1,11 +1,14 @@
 package events.project;
 
-import events.project.image.StorageService;
+
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-
-import javax.annotation.Resource;
+/**
+ * Główna klasa aplikacji
+ * @version 1.1
+ */
 
 @SpringBootApplication
 public class EventApplication {
@@ -14,12 +17,10 @@ public class EventApplication {
         SpringApplication.run(EventApplication.class, args);
     }
 
-    @Resource
-    StorageService storageService;
 
 
-    public void run(String... arg) throws Exception {
-        storageService.init();
-    }
+
+
+
 
 }

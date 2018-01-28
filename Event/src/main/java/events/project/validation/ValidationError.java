@@ -5,6 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Klasa błędów walidatorów
+ * @version 1.1
+ */
 public class ValidationError {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> errors = new ArrayList<>();

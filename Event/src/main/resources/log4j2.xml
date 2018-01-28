@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="INFO">
+    <appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="%highlight{%d{HH:mm:ss.SSS} %-5level %logger{36}.%M() @%L - %msg%n}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=default, DEBUG=green bold, TRACE=blue}"/>
+        </Console>
+    </appenders>
+
+    <loggers>
+    <root level="INFO">
+        <appender-ref ref="Console" level="info"/>
+    </root>
+        <logger level="DEBUG" name="events.project" additivity="false">
+            <appender-ref ref="Console" level="debug"/>
+        </logger>
+
+</loggers>
+
+
+
+</configuration>
