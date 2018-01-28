@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * Klasa konfiguracyjna Spring Security
+ *
  * @version 1.1
  */
 @Configuration
@@ -27,18 +28,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-            http//.formLogin().and()
-       .cors().and().httpBasic().and()
-                .authorizeRequests().antMatchers("/registerUser").permitAll().and()
-                    .authorizeRequests().antMatchers(HttpMethod.POST,"/logUser").permitAll().and()
-                    .authorizeRequests().antMatchers("/logUserTest").permitAll().and()
-                    .authorizeRequests() .antMatchers("/allConfirmedEvents").permitAll()
-                    .anyRequest().authenticated().
-                    and().logout().and()
-                //.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
-                .csrf().disable();
+        http
+                .csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/registerUser").permitAll()
+                .antMatchers(HttpMethod.POST, "/logUser").permitAll()
+                .antMatchers("/logUserTest").permitAll()
+                .antMatchers("/allConfirmedEvents").permitAll()
+                .anyRequest()
+                .authenticated();
     }
-
 
 
     @Override

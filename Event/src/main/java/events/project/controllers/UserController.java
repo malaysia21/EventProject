@@ -13,13 +13,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 /**
  * Controller dla klasy User
+ *
  * @version 1.1
  */
 @Log4j2
@@ -42,31 +49,35 @@ public class UserController {
         log.debug("Unable to create. Email " + email + " already exist.");
     }
 
-
     /**
      * Rejestracja użytkownika
-     * @param user dane nowego użytkownika
+     *
+     * @param user   dane nowego użytkownika
      * @param result BindingResult
      * @throws UserExistException
      */
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity addUser(@Valid @RequestBody UserDto user, BindingResult result) {
         if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));}
-        if (userService.isUserExist(user)) { throw new UserExistException(user);}
+            return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
+        }
+        if (userService.isUserExist(user)) {
+            throw new UserExistException(user);
+        }
         userService.addWithDefaultRole(user);
-        return  ResponseEntity.ok().build();
+        return ResponseEntity.ok().build();
     }
 
     /**
      * Pobranie informacji o zalogowanym użytkowniku
+     *
      * @param auth autentykacja użytkownika
      * @return login użytkownika
      */
     @GetMapping(value = "/loggedUser")
     public ResponseEntity login(Authentication auth) {
         String name = auth.getName();
-        return  ResponseEntity.ok(name);
+        return ResponseEntity.ok(name);
     }
 
     /**
@@ -80,29 +91,32 @@ public class UserController {
 
     /**
      * Zalogowanie użytkownika - test
-     * @param login login użytkownika
+     *
+     * @param login    login użytkownika
      * @param password hasło użytkownika
      */
     @GetMapping(value = "/logUserTest")
     public ResponseEntity loginTest(@RequestParam String login, @RequestParam String password) {
         boolean user = userService.login(login, password);
-        if (user = true) {
-            return  ResponseEntity.ok().build();
-        } else return  ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        if (user) {
+            return ResponseEntity.ok().build();
+        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     /**
      * Zalogowanie użytkownika
-     * @param user dane logowania
+     *
+     * @param user   dane logowania
      * @param result BindingResult
      */
     @RequestMapping(value = "/logUser", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity login(@Valid @RequestBody UserLogin user, BindingResult result) {
         if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));}
+            return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
+        }
         boolean login = userService.login(user.getLogin(), user.getPassword());
-        if (login == true) {
-            return  ResponseEntity.ok().build();
+        if (login) {
+            return ResponseEntity.ok().build();
         } else return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
