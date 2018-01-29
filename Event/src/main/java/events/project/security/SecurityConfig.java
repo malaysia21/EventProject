@@ -27,64 +27,17 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
-//
-//    @Autowired
-//    private DaoAuthenticationProvider authenticationProvider;
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/registerUser").permitAll()
-                .antMatchers(HttpMethod.POST, "/logUser").permitAll()
+                .antMatchers("/logUser").permitAll()
                 .antMatchers("/logUserTest").permitAll()
                 .antMatchers("/allConfirmedEvents").permitAll()
                 .anyRequest()
                 .authenticated();
     }
-//    @Bean
-//    public HttpSessionEventPublisher httpSessionEventPublisher() {
-//        return new HttpSessionEventPublisher();
-//    }
-//
-//    @Override
-//    protected void configure(
-//            AuthenticationManagerBuilder auth) throws Exception {
-//
-//        auth.authenticationProvider(authenticationProvider);
-//    }
-
-//
-//    private AuthenticationProvider authenticationProvider;
-//
-//    @Autowired
-//    @Qualifier("daoAuthenticationProvider")
-//    public void setAuthenticationProvider(AuthenticationProvider authenticationProvider) {
-//        this.authenticationProvider = authenticationProvider;
-//    }
-//
-//
-//    @Autowired
-//    public void configureAuthManager(AuthenticationManagerBuilder authenticationManagerBuilder){
-//        authenticationManagerBuilder.authenticationProvider(authenticationProvider);
-//    }
-
-
-
-
-
-//    @Bean
-//    public HttpSessionStrategy httpSessionStrategy() {
-//        return new CookieHttpSessionStrategy();
-//    }
-
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.authenticationProvider(authenticationProvider);
-//    }
-
-
-
 
 }

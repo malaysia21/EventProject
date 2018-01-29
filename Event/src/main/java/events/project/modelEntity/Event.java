@@ -3,10 +3,10 @@ package events.project.modelEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import events.project.validation.EventTypeConstraint;
 import lombok.Builder;
-import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.*;
 import org.springframework.stereotype.Component;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -30,7 +30,7 @@ public class Event implements Serializable {
     @EventTypeConstraint(enumClass = EventType.class, ignoreCase = true)
     @NotNull(message = "Event type may not be null")
     private String eventType;
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private Point point;
     @ManyToOne(cascade = CascadeType.PERSIST)
     private Address address;

@@ -167,13 +167,9 @@ public class EventServiceImpl implements EventService {
         event.setUser(user);
 
         Address address = getAddress(eventDto);
-        Point point = getPoint(eventDto);
-
         if (address == null) {event.setAddress(eventDto.getAddress());
         } else event.setAddress(address);
-        if (point == null) {event.setPoint(eventDto.getPoint());
-        } else event.setPoint(point);
-
+        event.getPoint().setDraggable(true);
         Event save = eventRepository.save(event);
         EventDto eventDtoReturned = toDto.map(save);
         return eventDtoReturned;
@@ -192,16 +188,14 @@ public class EventServiceImpl implements EventService {
         if (event==null) {throw new EventNotFoundException(id);}
 
         Address address = getAddress(eventDto);
-        Point point = getPoint(eventDto);
 
         if (address == null) {event.setAddress(eventDto.getAddress());
         } else event.setAddress(address);
 
-        if (point == null) {event.setPoint(eventDto.getPoint());
-        } else event.setPoint(point);
-
+        pointRepository.delete(event.getPoint());
         event.setName(eventDto.getName());
         event.setEventType(eventDto.getEventType());
+        event.setPoint(eventDto.getPoint());
         event.setBeginningDateTime(eventDto.getBeginningDateTime());
         event.setEndingDateTime(eventDto.getEndingDateTime());
 

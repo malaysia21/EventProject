@@ -31,10 +31,10 @@ public class EventSpecification {
                     predicates.add(builder.and(builder.equal(product.get("eventType"), event.getEventType())));
                 }
                 if (event.getDate() != null) {
-                    predicates.add(builder.and(builder.greaterThanOrEqualTo(product.get("beginningDateTime"), event.getDate())));
+                    predicates.add(builder.and(builder.lessThanOrEqualTo(product.get("beginningDateTime"), event.getDate())));
                 }
                 if (event.getDate() != null) {
-                    predicates.add(builder.and(builder.lessThanOrEqualTo(product.get("endingDateTime"), event.getDate())));
+                    predicates.add(builder.and(builder.greaterThanOrEqualTo(product.get("endingDateTime"), event.getDate())));
                 }
                 if (event.getPoint1() != null & event.getPoint2() != null) {
                     predicates.add(builder.and(builder.between(product.get("point").get("longitude"), event.getPoint1().getLongitude(), event.getPoint2().getLongitude())));

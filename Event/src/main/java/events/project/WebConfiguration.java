@@ -21,7 +21,7 @@ import java.util.Properties;
  */
 @ComponentScan
 @Configuration
-public class MyConfiguration {
+public class WebConfiguration {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
@@ -36,27 +36,5 @@ public class MyConfiguration {
             }
         };
     }
-
-
-
-    @Bean
-    public JavaMailSender getJavaMailSender() {
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.gmail.com");
-        mailSender.setPort(587);
-
-        mailSender.setUsername("");
-        mailSender.setPassword("");
-
-        Properties props = mailSender.getJavaMailProperties();
-        props.put("spring.mail.smtp.starttls.enable", "true");
-        props.put("spring.mail.transport.protocol", "smtp");
-        props.put("spring.mail.smtp.auth", "true");
-        props.put("spring.mail.debug", "true");
-
-        return mailSender;
-    }
-
-
 
 }

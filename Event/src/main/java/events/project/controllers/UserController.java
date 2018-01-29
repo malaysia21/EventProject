@@ -5,6 +5,7 @@ import events.project.modelDto.UserDto;
 import events.project.modelDto.UserLogin;
 import events.project.services.UserServiceImpl;
 import events.project.validation.ValidationErrorBuilder;
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -86,7 +87,7 @@ public class UserController {
     @GetMapping(value = "/logoutUser")
     public ResponseEntity logout(HttpServletRequest httpRequest) {
         userService.logoutUser(httpRequest.getSession(false));
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     /**

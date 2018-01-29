@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ComponentScan
 @Configuration
-public class DaoAuthenticationProvider {
+public class AuthenticationProviderConfiguration {
 
     @Autowired
     private CustomUserDetailsService userDetailsService;

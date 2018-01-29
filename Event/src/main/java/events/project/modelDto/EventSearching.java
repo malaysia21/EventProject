@@ -3,6 +3,8 @@ package events.project.modelDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import events.project.modelEntity.Point;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 /**
  * Obiekt zawiera kryteria wyszukiania wydarzeń
  * @version 1.1
@@ -11,15 +13,15 @@ public class EventSearching {
 
     private String name;
     private String eventType;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private LocalDate date;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
+    private LocalDateTime date;
     private Point point1;
     private Point point2;
 
     public EventSearching() {}
 
 
-    public EventSearching(String name, String eventType, LocalDate date, Point point1, Point point2) {
+    public EventSearching(String name, String eventType, LocalDateTime date, Point point1, Point point2) {
         this.name = name;
         this.eventType = eventType;
         this.date = date;
@@ -43,11 +45,11 @@ public class EventSearching {
         this.eventType = eventType;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate1(LocalDate date1) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

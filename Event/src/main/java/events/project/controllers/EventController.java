@@ -51,7 +51,7 @@ public class EventController {
     public void eventExist(EventExistException e) {
         String eventName = e.getEvent().getName();
         LocalDateTime startingDateTime = e.getEvent().getBeginningDateTime();
-        log.debug("Unable to create. Event with name " + eventName + " and date of launch" + startingDateTime + " already exist.");
+        log.debug("Unable to create. Event with name " + eventName + " and date of launch " + startingDateTime + " already exist.");
     }
 
     /**

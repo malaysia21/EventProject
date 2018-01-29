@@ -9,7 +9,7 @@ import events.project.modelDto.EventDto;
  */
 public class EventDtoToEventMapper implements Mapper<EventDto,Event> {
     @Override
-    public Event map(EventDto event) {
+    public  Event map(EventDto event) {
     return Event.builder().name(event.getName()).eventType(event.getEventType()).point(event.getPoint()).
             address(event.getAddress()).beginningDateTime(event.getBeginningDateTime()).endingDateTime(event.getEndingDateTime()).build();
 

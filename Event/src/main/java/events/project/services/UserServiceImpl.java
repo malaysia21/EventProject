@@ -36,24 +36,21 @@ public class UserServiceImpl implements UserService {
     private static final String DEFAULT_ROLE = "ROLE_USER";
     private UserRepository userRepository;
     private UserRoleRepository roleRepository;
+    private ApplicationEventPublisher applicationEventPublisher;
+    private PasswordEncoder passwordEncoder;
+    private DaoAuthenticationProvider authenticationProvider;
     private UserDtoToUserMapper toUser = new UserDtoToUserMapper();
 
-    @Autowired
-    private  ApplicationEventPublisher applicationEventPublisher;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserRoleRepository roleRepository,
+                           ApplicationEventPublisher applicationEventPublisher,
+                           PasswordEncoder passwordEncoder,
+                           DaoAuthenticationProvider authenticationProvider) {
         this.userRepository = userRepository;
-    }
-    @Autowired
-    public void setRoleRepository(UserRoleRepository roleRepository) {
         this.roleRepository = roleRepository;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationProvider = authenticationProvider;
     }
-
-    @Autowired
-    private DaoAuthenticationProvider authenticationProvider;
 
     /**
      * dodanie użytkownika
@@ -113,9 +110,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public boolean login(String login, String password) {
-        //String encode = passwordEncoder.encode(password);
         Authentication authentication = authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(login, password));
-
         boolean isAuthenticated = isAuthenticated(authentication);
         if (isAuthenticated) {
             SecurityContext context = SecurityContextHolder.getContext();
@@ -124,11 +119,6 @@ public class UserServiceImpl implements UserService {
         }
         return isAuthenticated;
     }
-
-
-
-
-
 
     @Override
     public boolean isAuthenticated(Authentication authentication) {
