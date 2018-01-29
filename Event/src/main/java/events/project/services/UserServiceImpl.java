@@ -8,10 +8,13 @@ import events.project.repositories.UserRepository;
 import events.project.modelEntity.UserRole;
 import events.project.repositories.UserRoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +39,9 @@ public class UserServiceImpl implements UserService {
     private UserDtoToUserMapper toUser = new UserDtoToUserMapper();
 
     @Autowired
+    private  ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -45,6 +51,7 @@ public class UserServiceImpl implements UserService {
     public void setRoleRepository(UserRoleRepository roleRepository) {
         this.roleRepository = roleRepository;
     }
+
     @Autowired
     private DaoAuthenticationProvider authenticationProvider;
 
@@ -106,14 +113,22 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public boolean login(String login, String password) {
+        //String encode = passwordEncoder.encode(password);
         Authentication authentication = authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(login, password));
+
         boolean isAuthenticated = isAuthenticated(authentication);
         if (isAuthenticated) {
             SecurityContext context = SecurityContextHolder.getContext();
             context.setAuthentication(authentication);
+            applicationEventPublisher.publishEvent(new AuthenticationSuccessEvent(authentication));
         }
         return isAuthenticated;
     }
+
+
+
+
+
 
     @Override
     public boolean isAuthenticated(Authentication authentication) {

@@ -110,12 +110,13 @@ public class UserController {
      * @param result BindingResult
      */
     @RequestMapping(value = "/logUser", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity login(@Valid @RequestBody UserLogin user, BindingResult result) {
+    public ResponseEntity login(@Valid @RequestBody UserLogin user, BindingResult result, HttpServletRequest request) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(result));
         }
         boolean login = userService.login(user.getLogin(), user.getPassword());
         if (login) {
+            request.getSession(true);
             return ResponseEntity.ok().build();
         } else return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
