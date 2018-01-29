@@ -39,10 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
+@WebMvcTest(EventController.class)
 @RunWith(SpringRunner.class)
-@WebMvcTest
-@Configuration
 public class EventControllerTest {
 
     @Autowired
@@ -50,7 +48,6 @@ public class EventControllerTest {
 
     @MockBean
     private EventService eventService;
-
 
     Point mockPoint = new Point(15.4785f, 58.1458f);
     Address mockAddress = new Address("WARSZAWA", "Kwiatowa", "9");
