@@ -93,7 +93,7 @@ public class EventController {
      * @return lista wydarzen
      */
     @GetMapping(value = "/userEvents", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<EventDto>> getuserEvents(Principal user) {
+    public ResponseEntity getuserEvents(Principal user) {
         User userByEmail = userService.findByEmail(user.getName());
         List<EventDto> eventList = eventService.findByUser(userByEmail.getId());
         if (eventList.isEmpty()) return ResponseEntity.noContent().build();
@@ -107,8 +107,8 @@ public class EventController {
      */
     @ResponseBody
     @GetMapping(value = "/event/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public EventDto getEvent(@PathVariable Long id) {
-        return eventService.findById(id);}
+    public ResponseEntity getEvent(@PathVariable Long id) {
+        return ResponseEntity.ok(eventService.findById(id));}
 
     /**
      * Utworzenie nowego wydarzenia

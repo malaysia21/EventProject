@@ -1,13 +1,26 @@
-package event.project;
+package event.project.controllers;
+
+
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * Główna klasa aplikacji
+ * @version 1.1
+ */
+
 @SpringBootApplication
-public class EventApplicationTests {
+public class EventApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(EventApplicationTests.class, args);
+        SpringApplication.run(EventApplication.class, args);
     }
+
+
+
+
+
+
 
 }
